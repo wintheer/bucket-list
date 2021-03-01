@@ -46,4 +46,8 @@ html {
 .b-nav-dropdown {
   list-style-type: none;
 }
+
+.b-navbar {
+  padding: 0 5vw;
+}
 </style>
