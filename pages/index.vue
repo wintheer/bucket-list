@@ -3,152 +3,73 @@
     <div class="content">
       <div class="header">
         <h1>Find a purpose in your life</h1>
-      </div>
-
-      
         
-        <div class="inspiration-images_left">
-          <img class="image-fill" src="../assets/cliff-dive.jpg" alt="">
         </div>
-        <button class="arrow left">
-          <ArrowButton/>
-        </button>
-        <div class="inspiration-images_middle">
-          <img class="image-fill" src="../assets/perform.jpg" alt="">
-        </div>
-        <button class="arrow right">
-          <ArrowButton/>
-        </button>
-        <div class="inspiration-images_right">
-          <img class="image-fill" src="../assets/piano.jpg" alt="">
-        </div>
-      
+      <splide :options="splideOptions">
+        <SplideSlide v-for="(image, index) in images" :key="index">
+          <img class="image-fill" :src="image.src" alt="image.path">
+        </SplideSlide>
+      </Splide>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ArrowButton from "../assets/svgs/arrow.svg"
+import { Splide, SplideSlide } from '@splidejs/vue-splide';
+import '@splidejs/splide/dist/css/themes/splide-default.min.css'
 
 export default Vue.extend({
   components: {
-    ArrowButton,
-  }
+    Splide,
+    SplideSlide,
+  },
+  data() {
+    return {
+      images: [
+        { src: require("../assets/perform.jpg") },
+        { src: require("../assets/cliff-dive.jpg") },
+        { src: require("../assets/piano.jpg") },
+        
+      ],
+      splideOptions: {
+        height: "60vh",
+        gap: "2rem",
+        type: 'loop',
+        focus: 'center',
+        perPage: 3,
+        perMove: 1, 
+        autoplay: true,
+        autoWidth: true,
+      }
+    };
+  },
 });
 </script>
 
 <style>
 h1 {
-  color: white;
-  font-size: 3rem;
-  text-shadow:
-    -2px -2px 0 #000,
-    2px -2px 0 #000,
-    -2px 2px 0 #000,
-    2px 2px 0 #000;
+  color: var(--txt-colour);
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 10px;
 }
 
 .content {
-  display: grid;
-  grid-template-columns: 1fr 40vw 1fr;
-  grid-template-areas: "left middle right";
-
-
-  justify-items: center;
-
-  height: 50rem;
-}
-
-button {
-  background: transparent;
-  border: 0;
-  outline: 0;
-}
-
-path {
-  transition: all 250ms ease-in-out;
-}
-
-.arrow {
-  cursor: pointer;
-  width: 70px;
-  height: 90px;
-  align-self: center;
-  z-index: 2;
-}
-
-.left{
-  grid-area: left;
-  justify-self: end;
-}
-
-.right {
-  grid-area: right;
-  justify-self: start;
-  transform: rotate(180deg);
-}
-
-.arrow:hover path {
-  stroke-width: 6;
-}
-
-.arrow:active path {
-  stroke-width: 8;
-  transition: all 200ms ease-in-out;
-}
-
-@media screen and (max-width: 992px) {
-  .content {
-    grid-template-columns: 100vw;
-  }
-
-  .left {
-    grid-area: left;
-    justify-self: start;
-  }
-
-  .right {
-    grid-area: left;
-    justify-self: end;
-  }
-}
-
-.header {
-  grid-area: middle;
-  z-index: 2;
-  padding-top: 10rem;
-}
-
-.inspiration-images_left {
-  grid-area: left;
-  
-  width: 100%;
-
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-}
-
-.inspiration-images_middle {
-  grid-area: middle;
-  width: 100%;
-
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-}
-
-.inspiration-images_right {
-  grid-area: right;
-  width: 100%;
-
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
+  height: 80vh;
 }
 
 .image-fill {
   height: 100%;
+}
+
+.header {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  z-index: 3;
+  padding-top: 10vh;
+  justify-content: center;
+  align-items: center;
+  
 }
 </style>

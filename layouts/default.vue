@@ -31,23 +31,21 @@
 </template>
 
 <style>
-html {
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
+/* Freddy's custom colour palette: https://coolors.co/0d1f22-6290c3-edf7f6-98473e-a37c40 */
+
+:root {
+  --jungle-green: #0D1F22;
+  --un-blue: #6290C3;
+  --txt-colour: #EDF7F6;
+  --chestnut: #98473E;
+  --sunburst: #A37C40;
+
+  /* Colour blind colours -- PROTANOPIA */
+  --jungle-green--cb: #141421;
+  --un-blue--cb: #7576B6;
+  --txt-colour--cb: #F1F1F6;
+  --chestnut--cb: #747440;
+  --sunburst--cb: #92914E;
 }
 
-.b-nav-dropdown {
-  list-style-type: none;
-}
-
-.b-navbar {
-  padding: 0 5vw;
-}
 </style>
