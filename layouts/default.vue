@@ -1,24 +1,25 @@
 <template>
   <div>
-    <b-navbar toggleable="md" type="dark" variant="primary">
+    <b-navbar toggleable="md" type="dark" variant="dark">
       <b-navbar-brand to="/">bucket-list</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav>
-          <b-nav-item to="/inspiration">Inspiration</b-nav-item>
-          <b-nav-item to="/partners">Partners</b-nav-item>
+        <b-navbar-nav class="mx-auto">
+          <b-nav-item class="pr-3" to="/inspiration">Inspiration</b-nav-item>
+          <b-nav-item class="pr-3" to="/partners">Partners</b-nav-item>
           <b-nav-item to="/community">Community</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
+        <b-navbar-nav>
           <b-nav-form>
             <b-form-input size="sm" class="mr-sm-2" placeholder="Search..."></b-form-input>
           </b-nav-form>
 
           <b-nav-item-dd text="User" right>
+            <template slot="button-content"><b-avatar/></template>
             <b-dropdown-item to="#">Profile</b-dropdown-item>
             <b-dropdown-item to="#">Sign Out</b-dropdown-item>
           </b-nav-item-dd>
@@ -47,5 +48,13 @@
   --chestnut--cb: #747440;
   --sunburst--cb: #92914E;
 }
+
+.navbar.navbar-dark.bg-dark{
+    background-color: --var(jungle-green)!important;
+ }
+
+ .nav-link {
+   font-size: 1.1rem;
+ }
 
 </style>

@@ -3,13 +3,20 @@
     <div class="content">
       <div class="header">
         <h1>Find a purpose in your life</h1>
-        
-        </div>
-      <splide :options="splideOptions">
+      </div>
+      <Splide :options="splideOptions">
         <SplideSlide v-for="(image, index) in images" :key="index">
           <img class="image-fill" :src="image.src" alt="image.path">
         </SplideSlide>
       </Splide>
+
+      <Information/>
+
+      <div class="container">
+        <div class="text-center">
+          <b-button class="m-4" size="lg" text-center>Start your journey now</b-button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -18,11 +25,13 @@
 import Vue from "vue";
 import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import '@splidejs/splide/dist/css/themes/splide-default.min.css'
+import Information from '../components/index-information';
 
 export default Vue.extend({
   components: {
     Splide,
     SplideSlide,
+    Information,
   },
   data() {
     return {
@@ -33,8 +42,8 @@ export default Vue.extend({
         
       ],
       splideOptions: {
-        height: "60vh",
-        gap: "2rem",
+        height: "50vh",
+        gap: "1rem",
         type: 'loop',
         focus: 'center',
         perPage: 3,
@@ -47,7 +56,7 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style scoped>
 h1 {
   color: var(--txt-colour);
   background-color: rgba(0, 0, 0, 0.6);
@@ -70,6 +79,6 @@ h1 {
   padding-top: 10vh;
   justify-content: center;
   align-items: center;
-  
 }
+
 </style>
