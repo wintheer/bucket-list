@@ -17,6 +17,8 @@
           <b-button class="m-4" size="lg" text-center>Start your journey now</b-button>
         </div>
       </div>
+
+      <Inspiration style="marginTop: 4rem" :header="'Inspiration'"/>
     </div>
   </div>
 </template>
@@ -25,13 +27,15 @@
 import Vue from "vue";
 import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import '@splidejs/splide/dist/css/themes/splide-default.min.css'
-import Information from '../components/index-information';
+import Information from '../components/index/information.vue';
+import Inspiration from '../components/index/inspiration.vue';
 
 export default Vue.extend({
   components: {
     Splide,
     SplideSlide,
     Information,
+    Inspiration,
   },
   data() {
     return {
@@ -58,9 +62,10 @@ export default Vue.extend({
 
 <style scoped>
 h1 {
+  font-size: 2rem;
   color: var(--txt-colour);
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px;
 }
 
 .content {
@@ -69,6 +74,7 @@ h1 {
 
 .image-fill {
   height: 100%;
+
 }
 
 .header {
@@ -76,7 +82,7 @@ h1 {
   display: flex;
   width: 100%;
   z-index: 3;
-  padding-top: 10vh;
+  padding-top: 5vh;
   justify-content: center;
   align-items: center;
 }

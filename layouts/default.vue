@@ -7,9 +7,10 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="mx-auto">
-          <b-nav-item class="pr-3" to="/inspiration">Inspiration</b-nav-item>
-          <b-nav-item class="pr-3" to="/partners">Partners</b-nav-item>
-          <b-nav-item to="/community">Community</b-nav-item>
+          <b-nav-item class="pr-2" to="/inspiration">Inspiration</b-nav-item>
+          <b-nav-item class="pr-2" to="/partners">Partners</b-nav-item>
+          <b-nav-item class="pr-2" to="/community">Community</b-nav-item>
+          <b-nav-item to="/about">About</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -55,6 +56,11 @@
 
  .nav-link {
    font-size: 1.1rem;
+ }
+
+ .navbar.navbar-dark.bg-dark.navbar-expand-md {
+   padding-top: 0 !important;
+   padding-bottom: 0 !important;
  }
 
 </style>
