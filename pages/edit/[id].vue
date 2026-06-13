@@ -3,7 +3,7 @@
     <NuxtLink :to="`/list/${id}`" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8">
       <UIcon name="i-lucide-arrow-left" class="size-4" /> Back
     </NuxtLink>
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Edit item</h1>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Edit this dream</h1>
     <div v-if="item">
       <BucketItemForm :initial="item" :is-editing="true" @submit="onSubmit" @cancel="router.push(`/list/${id}`)" />
     </div>

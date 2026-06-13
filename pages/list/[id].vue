@@ -66,7 +66,7 @@
 
       <!-- Status changer -->
       <div class="mb-8">
-        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Progress</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Where you are</p>
         <div class="flex gap-2 flex-wrap">
           <UButton
             v-for="s in statusOptions"
@@ -241,11 +241,11 @@ const reflectionText = ref('')
 const showCelebration = ref(false)
 const settingStatus = ref<ItemStatus | null>(null)
 
-const statusOptions: { value: ItemStatus; label: string; color: 'neutral' | 'info' | 'success' }[] = [
-  { value: 'idea',        label: 'Idea',        color: 'neutral' },
-  { value: 'in-progress', label: 'In Progress', color: 'info' },
-  { value: 'done',        label: 'Done',        color: 'success' },
-]
+const statusOptions = (Object.keys(STATUS_CONFIG) as ItemStatus[]).map(k => ({
+  value: k,
+  label: STATUS_CONFIG[k].label,
+  color: STATUS_CONFIG[k].color,
+}))
 
 const catIcon = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.icon ?? 'i-lucide-tag')
 const catLabel = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.label ?? '')

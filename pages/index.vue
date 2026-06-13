@@ -81,19 +81,19 @@
       <div class="max-w-5xl mx-auto flex flex-wrap gap-8 justify-center text-center">
         <div>
           <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.items.length }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">Total goals</p>
+          <p class="text-xs text-gray-500 mt-0.5">Dreams</p>
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.byStatus['in-progress'].length }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">In progress</p>
+          <p class="text-xs text-gray-500 mt-0.5">In motion</p>
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.byStatus.done.length }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">Completed</p>
+          <p class="text-xs text-gray-500 mt-0.5">Lived it</p>
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.completedThisYear.length }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">Done this year</p>
+          <p class="text-xs text-gray-500 mt-0.5">This year</p>
         </div>
       </div>
     </section>
@@ -171,10 +171,10 @@ function categoryColor(cat: ItemCategory) {
 }
 
 const features = [
-  { icon: 'i-lucide-list-plus',      title: 'Set your goals',   description: 'Add goals with a clear "why" behind each one.',        to: '/add' },
-  { icon: 'i-lucide-chart-line',     title: 'Track progress',   description: 'Move goals from idea to in progress to done.',          to: '/list' },
-  { icon: 'i-lucide-lightbulb',      title: 'Get inspired',     description: 'Browse 200+ prompts across 7 categories.',              to: '/discover' },
-  { icon: 'i-lucide-calendar-check', title: 'Reflect yearly',   description: 'Review what you completed and what it taught you.',     to: '/review' },
+  { icon: 'i-lucide-sparkles',       title: 'Dream freely',      description: 'Write down what you want to do and why it matters.',   to: '/add' },
+  { icon: 'i-lucide-chart-line',     title: 'Live your dreams',  description: 'Move things from dreaming to happening to lived.',      to: '/list' },
+  { icon: 'i-lucide-lightbulb',      title: 'Get inspired',      description: 'Browse hundreds of ideas across 7 categories.',         to: '/discover' },
+  { icon: 'i-lucide-calendar-check', title: 'Reflect yearly',    description: 'Revisit what you lived and what it taught you.',        to: '/review' },
 ]
 </script>
 

@@ -66,15 +66,15 @@ export const LIFE_AREAS: { value: LifeArea; label: string; icon: string }[] = [
 ]
 
 export const STATUS_CONFIG: Record<ItemStatus, { label: string; color: 'neutral' | 'info' | 'success' }> = {
-  'idea':        { label: 'Idea',        color: 'neutral' },
-  'in-progress': { label: 'In Progress', color: 'info' },
-  'done':        { label: 'Done',        color: 'success' },
+  'idea':        { label: 'Dreaming',  color: 'neutral' },
+  'in-progress': { label: 'Happening', color: 'info' },
+  'done':        { label: 'Lived it',  color: 'success' },
 }
 
 export const PRIORITY_CONFIG: Record<ItemPriority, { label: string }> = {
-  'someday':   { label: 'Someday' },
-  'near-term': { label: 'Near-term' },
-  'soon':      { label: 'Soon' },
+  'someday':   { label: 'One day' },
+  'near-term': { label: 'Next year or two' },
+  'soon':      { label: 'This year' },
 }
 
 export const DISCOVER_PROMPTS: Record<ItemCategory, string[]> = {

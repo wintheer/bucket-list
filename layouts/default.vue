@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav class="bg-gray-900 text-white px-6 py-3 flex items-center gap-6 sticky top-0 z-50">
-      <NuxtLink to="/" class="font-bold text-lg tracking-tight shrink-0">bucket-list</NuxtLink>
+      <NuxtLink to="/" class="font-bold text-lg tracking-tight shrink-0">bucket list</NuxtLink>
 
       <div class="flex items-center gap-1 mx-auto">
         <NuxtLink
@@ -16,7 +16,7 @@
       </div>
 
       <div class="flex items-center gap-3 shrink-0">
-        <UButton size="sm" icon="i-lucide-plus" to="/add">Add</UButton>
+        <UButton size="sm" icon="i-lucide-plus" to="/add">Add a dream</UButton>
       </div>
     </nav>
 
@@ -30,10 +30,9 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navLinks = [
-  { to: '/list',     label: 'My List' },
-  { to: '/discover', label: 'Discover' },
-  { to: '/review',   label: 'Review' },
-  { to: '/about',    label: 'About' },
+  { to: '/list',     label: 'My Dreams' },
+  { to: '/discover', label: 'Get Inspired' },
+  { to: '/review',   label: 'Year in Review' },
 ]
 </script>
 

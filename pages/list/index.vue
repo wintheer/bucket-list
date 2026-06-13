@@ -2,7 +2,7 @@
   <div class="max-w-6xl mx-auto px-6 py-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Bucket List</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Dreams</h1>
         <p class="text-gray-500 mt-1">{{ $t('list.subtitle', store.items.length) }}</p>
       </div>
       <div class="flex gap-3">
@@ -14,7 +14,7 @@
         >
           Surprise me
         </UButton>
-        <UButton icon="i-lucide-plus" to="/add">Add item</UButton>
+        <UButton icon="i-lucide-plus" to="/add">Add a dream</UButton>
       </div>
     </div>
 
@@ -61,23 +61,23 @@
 
     <!-- Skeleton loading -->
     <div v-if="!store.loaded" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div v-for="i in 6" :key="i" class="rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-3 animate-pulse">
+      <div v-for="i in 6" :key="i" class="rounded-2xl border border-gray-100 dark:border-gray-800 p-6 space-y-3 animate-pulse">
         <div class="flex justify-between gap-3">
-          <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-2/3" />
-          <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-16 shrink-0" />
+          <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-16" />
+          <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-12 shrink-0" />
         </div>
-        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-full" />
-        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-4/5" />
-        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-1/3 mt-4" />
+        <div class="h-5 bg-gray-100 dark:bg-gray-800 rounded w-4/5" />
+        <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-full" />
+        <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-3/4" />
       </div>
     </div>
 
     <!-- Empty state -->
     <div v-else-if="filtered.length === 0" class="text-center py-24 text-gray-400">
-      <UIcon name="i-lucide-inbox" class="size-12 mx-auto mb-4" />
-      <p class="text-lg font-medium">Nothing here yet</p>
-      <p class="text-sm mt-1">Add your first bucket list item or clear the filters.</p>
-      <UButton class="mt-6" to="/add">Add your first item</UButton>
+      <UIcon name="i-lucide-sparkles" class="size-12 mx-auto mb-4 text-gray-300" />
+      <p class="text-lg font-medium text-gray-600 dark:text-gray-300">Your story starts here</p>
+      <p class="text-sm mt-1">Every great life began with a single dream.</p>
+      <UButton class="mt-6" to="/add">Dream something up</UButton>
     </div>
 
     <!-- Grid -->
@@ -88,33 +88,29 @@
         :to="`/list/${item.id}`"
         class="group block"
       >
-        <UCard class="h-full transition-shadow hover:shadow-md cursor-pointer">
-          <div v-if="item.imageUrl" class="-mx-4 -mt-4 sm:-mx-6 sm:-mt-6 mb-4">
-            <img :src="item.imageUrl" :alt="item.title" class="w-full h-40 object-cover rounded-t-lg">
+        <div class="relative h-full rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md transition-all overflow-hidden p-6">
+          <!-- Image -->
+          <div v-if="item.imageUrl" class="-mx-6 -mt-6 mb-5">
+            <img :src="item.imageUrl" :alt="item.title" class="w-full h-40 object-cover">
           </div>
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 leading-snug">{{ item.title }}</h3>
+          <!-- Category + status row -->
+          <div class="flex items-center justify-between mb-3">
+            <span class="flex items-center gap-1.5 text-xs font-medium" :class="categoryColor(item.category)">
+              <UIcon :name="categoryIcon(item.category)" class="size-3.5" />
+              {{ categoryLabel(item.category) }}
+            </span>
             <UBadge
               :label="STATUS_CONFIG[item.status].label"
               :color="STATUS_CONFIG[item.status].color"
               variant="soft"
               size="xs"
-              class="shrink-0"
             />
           </div>
-          <p v-if="item.why" class="text-sm text-gray-500 italic line-clamp-2 mb-3">"{{ item.why }}"</p>
-          <div class="flex items-center gap-2 mt-auto flex-wrap">
-            <span :class="categoryColor(item.category)" class="flex items-center gap-1 text-xs font-medium">
-              <UIcon :name="categoryIcon(item.category)" class="size-3.5" />
-              {{ categoryLabel(item.category) }}
-            </span>
-            <span class="text-gray-300">·</span>
-            <span class="text-xs text-gray-400">{{ PRIORITY_CONFIG[item.priority].label }}</span>
-            <span v-if="item.location" class="text-xs text-gray-400 flex items-center gap-1 ml-auto">
-              <UIcon name="i-lucide-map-pin" class="size-3" />{{ item.location }}
-            </span>
-          </div>
-        </UCard>
+          <!-- Title -->
+          <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-snug mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{{ item.title }}</h3>
+          <!-- Why — the emotional anchor -->
+          <p v-if="item.why" class="text-sm text-gray-500 dark:text-gray-400 italic leading-relaxed line-clamp-2">"{{ item.why }}"</p>
+        </div>
       </NuxtLink>
     </div>
 
@@ -122,12 +118,12 @@
     <UModal v-model:open="showRandom">
       <template #content>
         <div class="p-6" v-if="randomItem">
-          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Today, do this:</p>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">A dream calling your name</p>
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ randomItem.title }}</h2>
           <p class="text-gray-500 italic mb-6">"{{ randomItem.why }}"</p>
           <div class="flex gap-3">
-            <UButton :to="`/list/${randomItem.id}`" @click="showRandom = false">View item</UButton>
-            <UButton variant="outline" color="neutral" @click="pickRandom">Pick another</UButton>
+            <UButton :to="`/list/${randomItem.id}`" @click="showRandom = false">Explore this</UButton>
+            <UButton variant="outline" color="neutral" @click="pickRandom">Another one</UButton>
             <UButton variant="ghost" color="neutral" class="ml-auto" @click="showRandom = false">Close</UButton>
           </div>
         </div>
@@ -151,9 +147,9 @@ const showRandom = ref(false)
 const randomItem = ref<BucketItem | undefined>()
 
 const statuses: { value: ItemStatus; label: string }[] = [
-  { value: 'idea', label: 'Ideas' },
-  { value: 'in-progress', label: 'In Progress' },
-  { value: 'done', label: 'Done' },
+  { value: 'idea',        label: STATUS_CONFIG.idea.label },
+  { value: 'in-progress', label: STATUS_CONFIG['in-progress'].label },
+  { value: 'done',        label: STATUS_CONFIG.done.label },
 ]
 
 const filtered = computed(() => {
@@ -171,11 +167,11 @@ const progressPercent = computed(() => {
 
 const progressMessage = computed(() => {
   const p = progressPercent.value
-  if (p === 100) return 'You\'ve done it all — time to dream bigger.'
-  if (p >= 75) return 'Almost there — the finish line is in sight.'
-  if (p >= 50) return 'Over halfway! You\'re building real momentum.'
-  if (p >= 25) return 'A solid start — keep the energy going.'
-  if (p > 0)   return 'Every big life starts with a first step.'
+  if (p === 100) return 'You\'ve lived them all — time to dream bigger.'
+  if (p >= 75)   return 'Almost there — the finish line is in sight.'
+  if (p >= 50)   return 'Over halfway. You\'re building a life to be proud of.'
+  if (p >= 25)   return 'A beautiful start. Keep going.'
+  if (p > 0)     return 'Every big life starts with a first step.'
   return 'The journey of a thousand miles begins with a single step.'
 })
 

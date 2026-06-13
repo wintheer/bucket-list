@@ -199,25 +199,32 @@
               </button>
             </div>
 
-            <Transition name="fade-up">
-              <div v-if="form.priority" class="space-y-4 pt-2">
-                <div class="flex items-center gap-3 py-3 px-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-                  <UToggle v-model="form.isPrivate" />
-                  <div>
-                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Keep this private</p>
-                    <p class="text-xs text-gray-400">Public goals can inspire others in the discover section</p>
-                  </div>
-                </div>
-                <UButton
-                  size="lg"
-                  :loading="submitting"
-                  class="w-full justify-center"
-                  @click="submit"
-                >
-                  Add to my list
-                </UButton>
+            <label class="flex items-center gap-3 py-3 px-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 cursor-pointer select-none">
+              <input type="checkbox" v-model="form.isPrivate" class="sr-only" />
+              <div
+                class="relative w-10 h-6 rounded-full transition-colors duration-200 shrink-0"
+                :class="form.isPrivate ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'"
+              >
+                <div
+                  class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"
+                  :class="form.isPrivate ? 'translate-x-5' : 'translate-x-1'"
+                />
               </div>
-            </Transition>
+              <div>
+                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Keep this dream private</p>
+                <p class="text-xs text-gray-400">Public dreams can inspire others in the discover section</p>
+              </div>
+            </label>
+
+            <button
+              v-if="form.priority"
+              type="button"
+              :disabled="submitting"
+              class="w-full py-3 px-6 rounded-xl bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold text-base transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              @click="submit"
+            >
+              {{ submitting ? 'Adding...' : 'Add this dream' }}
+            </button>
 
             <div class="flex items-center justify-start">
               <UButton variant="ghost" color="neutral" :disabled="submitting" @click="back">Back</UButton>
@@ -270,22 +277,22 @@ function useSuggestion(s: { title: string; category: ItemCategory }) {
 const PRIORITIES: { value: ItemPriority; label: string; description: string; icon: string; color: string }[] = [
   {
     value: 'soon',
-    label: 'Soon',
-    description: "I'm actively planning this or working on it now.",
+    label: 'This year',
+    description: "I'm actively planning this or making it happen now.",
     icon: 'i-lucide-flame',
     color: 'text-orange-500',
   },
   {
     value: 'near-term',
-    label: 'Near-term',
-    description: "I'd like to do this within the next year or two.",
+    label: 'Next year or two',
+    description: "I'd love to do this in the near future.",
     icon: 'i-lucide-calendar',
     color: 'text-blue-500',
   },
   {
     value: 'someday',
-    label: 'Someday',
-    description: "A dream I'm holding onto. The timing isn't right yet.",
+    label: 'One day',
+    description: "A dream I'm holding onto for the right moment.",
     icon: 'i-lucide-cloud',
     color: 'text-gray-400',
   },

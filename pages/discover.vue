@@ -4,8 +4,8 @@
     <!-- Header -->
     <div class="flex items-start justify-between gap-4 mb-8 flex-wrap">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Discover</h1>
-        <p class="text-gray-500 mt-1">{{ totalPrompts }} ideas across {{ CATEGORIES.length }} categories.</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Get Inspired</h1>
+        <p class="text-gray-500 mt-1">{{ totalPrompts }} dreams waiting to be lived, across {{ CATEGORIES.length }} worlds.</p>
       </div>
       <UButton variant="outline" color="neutral" icon="i-lucide-sparkles" @click="inspire">
         Inspire me
@@ -86,7 +86,7 @@
               <div>
                 <p class="font-semibold text-gray-900 dark:text-white">{{ cat.label }}</p>
                 <p class="text-xs text-gray-400 mt-0.5">
-                  {{ DISCOVER_PROMPTS[cat.value].length }} ideas
+                  {{ DISCOVER_PROMPTS[cat.value].length }} dreams
                   <span v-if="store.byCategory[cat.value]?.length" class="text-primary-400"> · {{ store.byCategory[cat.value]!.length }} on your list</span>
                 </p>
               </div>
@@ -130,7 +130,7 @@
         <!-- Inspiration prompts -->
         <div>
           <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-            {{ DISCOVER_PROMPTS[activeCategory].length }} ideas to spark yours
+            {{ DISCOVER_PROMPTS[activeCategory].length }} dreams to spark yours
           </p>
           <div class="space-y-2">
             <PromptRow

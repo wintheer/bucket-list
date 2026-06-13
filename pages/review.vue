@@ -2,29 +2,27 @@
   <div class="max-w-4xl mx-auto px-6 py-10">
     <div class="mb-10">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ year }} in Review</h1>
-      <p class="text-gray-500 mt-1">Your bucket list progress this year.</p>
+      <p class="text-gray-500 mt-1">A year of living fully.</p>
     </div>
 
-    <!-- Stats row -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-      <UCard v-for="stat in stats" :key="stat.label" class="text-center">
-        <div class="py-2">
-          <div class="flex items-center justify-center gap-1 mb-1">
-            <UIcon :name="stat.icon" class="size-4" :class="stat.color" />
-          </div>
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
-          <p class="text-xs text-gray-500 mt-1">{{ stat.label }}</p>
+    <!-- Stats row — open numbers, no cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-14">
+      <div v-for="stat in stats" :key="stat.label" class="text-center">
+        <div class="flex items-center justify-center mb-2">
+          <UIcon :name="stat.icon" class="size-5" :class="stat.color" />
         </div>
-      </UCard>
+        <p class="text-4xl font-bold text-gray-900 dark:text-white leading-none">{{ stat.value }}</p>
+        <p class="text-xs text-gray-400 mt-2">{{ stat.label }}</p>
+      </div>
     </div>
 
     <!-- Life area breakdown -->
     <div class="mb-12">
-      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">Life area breakdown</p>
+      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">Where you put your energy</p>
       <div class="space-y-5">
         <div v-for="area in lifeAreaBreakdown" :key="area.value">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <span class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <UIcon :name="area.icon" class="size-4 text-gray-400" />
               {{ area.label }}
             </span>
@@ -32,7 +30,7 @@
               {{ area.done }}/{{ area.total }}
             </span>
           </div>
-          <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
             <div
               class="h-full rounded-full transition-all duration-700 ease-out"
               :class="area.pct === 100 ? 'bg-green-400' : 'bg-primary-400'"
@@ -43,46 +41,48 @@
       </div>
     </div>
 
-    <!-- Completed this year -->
+    <!-- Lived this year -->
     <div class="mb-12">
       <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-        Completed this year ({{ store.completedThisYear.length }})
+        Lived this year ({{ store.completedThisYear.length }})
       </p>
-      <div v-if="!store.completedThisYear.length" class="text-gray-400 text-sm py-4">
-        Nothing completed yet this year — but the year is still young.
+      <div v-if="!store.completedThisYear.length" class="text-gray-400 text-sm py-4 italic">
+        This chapter is still being written.
       </div>
       <div v-else class="space-y-3">
         <NuxtLink
           v-for="item in store.completedThisYear"
           :key="item.id"
           :to="`/list/${item.id}`"
-          class="flex items-start gap-4 p-5 rounded-xl border border-green-100 bg-green-50 hover:bg-green-100 transition-colors"
+          class="flex items-start gap-4 p-5 rounded-2xl border border-green-100 dark:border-green-900/50 bg-green-50 dark:bg-green-950/20 hover:bg-green-100 dark:hover:bg-green-950/40 transition-colors"
         >
           <UIcon name="i-lucide-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
           <div class="min-w-0">
             <p class="font-semibold text-gray-900 dark:text-white">{{ item.title }}</p>
-            <p v-if="item.reflection" class="text-sm text-gray-600 mt-1 italic line-clamp-2">"{{ item.reflection }}"</p>
-            <p v-else class="text-sm text-gray-400 mt-1">No reflection written yet.</p>
+            <p v-if="item.reflection" class="text-sm text-gray-600 dark:text-gray-400 mt-1 italic line-clamp-2">"{{ item.reflection }}"</p>
+            <p v-else class="text-sm text-gray-400 mt-1">No story written yet.</p>
           </div>
           <span class="text-xs text-gray-400 shrink-0 mt-0.5 ml-auto">{{ formatDate(item.completedAt!) }}</span>
         </NuxtLink>
       </div>
     </div>
 
-    <!-- Added this year -->
+    <!-- Dreamed this year -->
     <div>
       <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-        Added this year ({{ store.addedThisYear.length }})
+        Dreamed this year ({{ store.addedThisYear.length }})
       </p>
-      <div v-if="!store.addedThisYear.length" class="text-gray-400 text-sm py-4">Nothing added yet.</div>
+      <div v-if="!store.addedThisYear.length" class="text-gray-400 text-sm py-4 italic">
+        Nothing dreamed yet — but the year is still young.
+      </div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <NuxtLink
           v-for="item in store.addedThisYear"
           :key="item.id"
           :to="`/list/${item.id}`"
-          class="flex items-center justify-between gap-3 p-4 rounded-xl border border-gray-100 bg-white hover:bg-gray-50 transition-colors"
+          class="flex items-center justify-between gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
-          <span class="text-gray-800 font-medium truncate">{{ item.title }}</span>
+          <span class="text-gray-800 dark:text-gray-200 font-medium truncate">{{ item.title }}</span>
           <UBadge
             :label="STATUS_CONFIG[item.status].label"
             :color="STATUS_CONFIG[item.status].color"
@@ -113,10 +113,10 @@ onMounted(async () => {
 const year = new Date().getFullYear()
 
 const stats = computed(() => [
-  { label: 'Total goals',    value: store.items.length,                  icon: 'i-lucide-list',         color: 'text-gray-400' },
-  { label: 'Completed',      value: store.byStatus.done.length,          icon: 'i-lucide-check-circle', color: 'text-green-500' },
-  { label: 'In progress',    value: store.byStatus['in-progress'].length, icon: 'i-lucide-zap',          color: 'text-blue-400' },
-  { label: 'Done this year', value: store.completedThisYear.length,      icon: 'i-lucide-star',         color: 'text-yellow-400' },
+  { label: 'Dreams on your list', value: store.items.length,                   icon: 'i-lucide-list',         color: 'text-gray-400' },
+  { label: 'Lived it',            value: store.byStatus.done.length,           icon: 'i-lucide-check-circle', color: 'text-green-500' },
+  { label: 'In motion',           value: store.byStatus['in-progress'].length, icon: 'i-lucide-zap',          color: 'text-blue-400' },
+  { label: 'Lived this year',     value: store.completedThisYear.length,       icon: 'i-lucide-star',         color: 'text-yellow-400' },
 ])
 
 const lifeAreaBreakdown = computed(() =>
