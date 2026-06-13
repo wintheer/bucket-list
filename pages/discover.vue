@@ -30,7 +30,7 @@
     <!-- Category detail -->
     <div v-else>
       <button
-        class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-8"
+        class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8"
         @click="activeCategory = null"
       >
         <UIcon name="i-lucide-arrow-left" class="size-4" /> All categories

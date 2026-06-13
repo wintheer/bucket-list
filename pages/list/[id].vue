@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-3xl mx-auto px-6 py-10">
-    <NuxtLink to="/list" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-8">
+    <NuxtLink to="/list" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8">
       <UIcon name="i-lucide-arrow-left" class="size-4" /> Back to list
     </NuxtLink>
 
@@ -59,9 +59,11 @@
             size="sm"
             :variant="item.status === s.value ? 'solid' : 'outline'"
             :color="item.status === s.value ? s.color : 'neutral'"
+            :loading="settingStatus === s.value"
             @click="setStatus(s.value)"
           >
             <UIcon v-if="s.value === 'done'" name="i-lucide-check" class="mr-1" />
+            <UIcon v-else-if="s.value === 'in-progress'" name="i-lucide-zap" class="mr-1" />
             {{ s.label }}
           </UButton>
         </div>
@@ -116,6 +118,14 @@
       </div>
     </template>
 
+    <!-- Celebration modal -->
+    <CelebrationModal
+      :show="showCelebration"
+      :item="item ?? undefined"
+      @close="showCelebration = false"
+      @reflect="onCelebrationReflect"
+    />
+
     <!-- Delete confirm modal -->
     <UModal v-model:open="confirmDelete">
       <template #content>
@@ -142,6 +152,9 @@ import type { ItemStatus } from '~/types/bucket'
 const route = useRoute()
 const router = useRouter()
 const store = useBucketListStore()
+const toast = useToast()
+const { fire: fireConfetti } = useConfetti()
+
 onMounted(() => store.load())
 
 const id = route.params.id as string
@@ -150,6 +163,8 @@ const item = computed(() => store.getById(id))
 const confirmDelete = ref(false)
 const editingReflection = ref(false)
 const reflectionText = ref('')
+const showCelebration = ref(false)
+const settingStatus = ref<ItemStatus | null>(null)
 
 const statusOptions: { value: ItemStatus; label: string; color: 'neutral' | 'info' | 'success' }[] = [
   { value: 'idea',        label: 'Idea',        color: 'neutral' },
@@ -166,15 +181,35 @@ function formatDate(iso: string) {
 }
 
 async function setStatus(status: ItemStatus) {
-  await store.updateItem(id, { status })
-  if (status === 'done' && !item.value?.reflection) {
-    setTimeout(() => startReflection(), 300)
+  if (status === item.value?.status) return
+  settingStatus.value = status
+  try {
+    await store.updateItem(id, { status })
+    if (status === 'done') {
+      await fireConfetti()
+      showCelebration.value = true
+    } else if (status === 'in-progress') {
+      toast.add({
+        title: 'Goal activated!',
+        description: 'Time to make it happen.',
+        icon: 'i-lucide-zap',
+        color: 'info',
+        duration: 3000,
+      })
+    }
+  } finally {
+    settingStatus.value = null
   }
 }
 
 function startReflection() {
   reflectionText.value = item.value?.reflection ?? ''
   editingReflection.value = true
+}
+
+function onCelebrationReflect() {
+  showCelebration.value = false
+  startReflection()
 }
 
 async function saveReflection() {

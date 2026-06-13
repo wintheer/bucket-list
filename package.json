@@ -12,11 +12,13 @@
   "dependencies": {
     "@nuxt/ui": "^3.0.0",
     "@pinia/nuxt": "^0.11.3",
+    "canvas-confetti": "^1.9.4",
     "mongodb": "^7.3.0",
     "nuxt": "^4.4.8",
     "pinia": "^3.0.4"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@vitejs/plugin-vue": "^5.0.0",
     "@vue/test-utils": "^2.0.0",
     "typescript": "^5.0.0",

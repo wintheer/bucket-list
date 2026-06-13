@@ -18,6 +18,26 @@
       </div>
     </div>
 
+    <!-- Progress bar -->
+    <div v-if="store.items.length > 0" class="mb-8 p-5 rounded-xl bg-gray-50 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-gray-700">
+          {{ store.byStatus.done.length }} of {{ store.items.length }} completed
+        </span>
+        <span class="text-sm font-semibold" :class="progressPercent === 100 ? 'text-green-500' : 'text-gray-400'">
+          {{ progressPercent }}%
+        </span>
+      </div>
+      <div class="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          class="h-full rounded-full transition-all duration-700 ease-out"
+          :class="progressPercent === 100 ? 'bg-green-400' : progressPercent >= 50 ? 'bg-primary-400' : 'bg-primary-300'"
+          :style="{ width: `${progressPercent}%` }"
+        />
+      </div>
+      <p class="text-xs text-gray-400 mt-2">{{ progressMessage }}</p>
+    </div>
+
     <!-- Filters -->
     <div class="flex flex-wrap gap-3 mb-8">
       <div class="flex gap-2 flex-wrap">
@@ -138,6 +158,21 @@ const filtered = computed(() => {
     if (activeCategory.value && item.category !== activeCategory.value) return false
     return true
   })
+})
+
+const progressPercent = computed(() => {
+  if (!store.items.length) return 0
+  return Math.round((store.byStatus.done.length / store.items.length) * 100)
+})
+
+const progressMessage = computed(() => {
+  const p = progressPercent.value
+  if (p === 100) return 'You\'ve done it all — time to dream bigger.'
+  if (p >= 75) return 'Almost there — the finish line is in sight.'
+  if (p >= 50) return 'Over halfway! You\'re building real momentum.'
+  if (p >= 25) return 'A solid start — keep the energy going.'
+  if (p > 0)   return 'Every big life starts with a first step.'
+  return 'The journey of a thousand miles begins with a single item.'
 })
 
 function categoryIcon(cat: ItemCategory) {

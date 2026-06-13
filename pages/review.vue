@@ -9,6 +9,9 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
       <UCard v-for="stat in stats" :key="stat.label" class="text-center">
         <div class="py-2">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <UIcon :name="stat.icon" class="size-4" :class="stat.color" />
+          </div>
           <p class="text-3xl font-bold text-gray-900">{{ stat.value }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ stat.label }}</p>
         </div>
@@ -18,19 +21,22 @@
     <!-- Life area breakdown -->
     <div class="mb-12">
       <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">Life area breakdown</p>
-      <div class="space-y-4">
+      <div class="space-y-5">
         <div v-for="area in lifeAreaBreakdown" :key="area.value">
-          <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center justify-between mb-1.5">
             <span class="flex items-center gap-2 text-sm font-medium text-gray-700">
               <UIcon :name="area.icon" class="size-4 text-gray-400" />
               {{ area.label }}
             </span>
-            <span class="text-sm text-gray-400">{{ area.done }}/{{ area.total }}</span>
+            <span class="text-xs font-semibold" :class="area.pct === 100 ? 'text-green-500' : 'text-gray-400'">
+              {{ area.done }}/{{ area.total }}
+            </span>
           </div>
-          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              class="h-full bg-primary-400 rounded-full transition-all"
-              :style="{ width: area.total ? `${(area.done / area.total) * 100}%` : '0%' }"
+              class="h-full rounded-full transition-all duration-700 ease-out"
+              :class="area.pct === 100 ? 'bg-green-400' : 'bg-primary-400'"
+              :style="{ width: mounted ? `${area.pct}%` : '0%' }"
             />
           </div>
         </div>
@@ -91,29 +97,38 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useBucketListStore } from '~/stores/bucketList'
 import { LIFE_AREAS, STATUS_CONFIG } from '~/types/bucket'
 
 const store = useBucketListStore()
-onMounted(() => store.load())
+const mounted = ref(false)
+
+onMounted(async () => {
+  await store.load()
+  await nextTick()
+  mounted.value = true
+})
 
 const year = new Date().getFullYear()
 
 const stats = computed(() => [
-  { label: 'Total goals',     value: store.items.length },
-  { label: 'Completed',       value: store.byStatus.done.length },
-  { label: 'In progress',     value: store.byStatus['in-progress'].length },
-  { label: 'Done this year',  value: store.completedThisYear.length },
+  { label: 'Total goals',    value: store.items.length,                  icon: 'i-lucide-list',         color: 'text-gray-400' },
+  { label: 'Completed',      value: store.byStatus.done.length,          icon: 'i-lucide-check-circle', color: 'text-green-500' },
+  { label: 'In progress',    value: store.byStatus['in-progress'].length, icon: 'i-lucide-zap',          color: 'text-blue-400' },
+  { label: 'Done this year', value: store.completedThisYear.length,      icon: 'i-lucide-star',         color: 'text-yellow-400' },
 ])
 
 const lifeAreaBreakdown = computed(() =>
   LIFE_AREAS.map(area => {
     const all = store.byLifeArea[area.value] ?? []
+    const done = all.filter(i => i.status === 'done').length
+    const total = all.length
     return {
       ...area,
-      total: all.length,
-      done: all.filter(i => i.status === 'done').length,
+      total,
+      done,
+      pct: total ? Math.round((done / total) * 100) : 0,
     }
   }).filter(a => a.total > 0)
 )
