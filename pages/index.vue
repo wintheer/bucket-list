@@ -16,7 +16,7 @@
     </section>
 
     <!-- Stats bar -->
-    <section class="bg-white border-b border-gray-100 py-6 px-6">
+    <section class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 py-6 px-6">
       <div class="max-w-5xl mx-auto flex flex-wrap gap-8 justify-center text-center">
         <div>
           <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.items.length }}</p>
@@ -38,7 +38,7 @@
     </section>
 
     <!-- Feature cards -->
-    <section class="py-16 px-6 bg-gray-50">
+    <section class="py-16 px-6 bg-gray-50 dark:bg-gray-900">
       <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <NuxtLink v-for="feature in features" :key="feature.title" :to="feature.to" class="block group">
           <UCard class="h-full shadow-sm transition-shadow group-hover:shadow-md">
