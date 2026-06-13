@@ -1,36 +1,35 @@
 <template>
   <div>
-    <b-navbar toggleable="md" type="dark" variant="dark">
-      <b-navbar-brand to="/">bucket-list</b-navbar-brand>
+    <nav class="bg-gray-900 text-white px-6 py-3 flex items-center gap-6">
+      <NuxtLink to="/" class="font-bold text-lg tracking-tight">bucket-list</NuxtLink>
 
-      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <div class="flex items-center gap-4 mx-auto">
+        <NuxtLink class="nav-link" to="/inspiration">Inspiration</NuxtLink>
+        <NuxtLink class="nav-link" to="/partners">Partners</NuxtLink>
+        <NuxtLink class="nav-link" to="/community">Community</NuxtLink>
+        <NuxtLink class="nav-link" to="/about">About</NuxtLink>
+      </div>
 
-      <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav class="mx-auto">
-          <b-nav-item class="pr-2" to="/inspiration">Inspiration</b-nav-item>
-          <b-nav-item class="pr-2" to="/partners">Partners</b-nav-item>
-          <b-nav-item class="pr-2" to="/community">Community</b-nav-item>
-          <b-nav-item to="/about">About</b-nav-item>
-        </b-navbar-nav>
+      <div class="flex items-center gap-3">
+        <UInput size="sm" placeholder="Search..." />
+        <UDropdownMenu :items="userMenuItems">
+          <UAvatar size="sm" />
+        </UDropdownMenu>
+      </div>
+    </nav>
 
-        <!-- Right aligned nav items -->
-        <b-navbar-nav>
-          <b-nav-form>
-            <b-form-input size="sm" class="mr-sm-2" placeholder="Search..."></b-form-input>
-          </b-nav-form>
-
-          <b-nav-item-dd text="User" right>
-            <template slot="button-content"><b-avatar/></template>
-            <b-dropdown-item to="#">Profile</b-dropdown-item>
-            <b-dropdown-item to="#">Sign Out</b-dropdown-item>
-          </b-nav-item-dd>
-        </b-navbar-nav>
-      </b-collapse>
-    </b-navbar>
-
-    <Nuxt />
+    <NuxtPage />
   </div>
 </template>
+
+<script setup lang="ts">
+const userMenuItems = [
+  [
+    { label: 'Profile', to: '#' },
+    { label: 'Sign Out', to: '#' },
+  ],
+]
+</script>
 
 <style>
 /* Freddy's custom colour palette: https://coolors.co/0d1f22-6290c3-edf7f6-98473e-a37c40 */
@@ -50,17 +49,14 @@
   --sunburst--cb: #92914E;
 }
 
-.navbar.navbar-dark.bg-dark{
-    background-color: --var(jungle-green)!important;
- }
+.nav-link {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.15s;
+}
 
- .nav-link {
-   font-size: 1.1rem;
- }
-
- .navbar.navbar-dark.bg-dark.navbar-expand-md {
-   padding-top: 0 !important;
-   padding-bottom: 0 !important;
- }
+.nav-link:hover {
+  color: #fff;
+}
 
 </style>

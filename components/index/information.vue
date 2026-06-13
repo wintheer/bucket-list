@@ -1,23 +1,13 @@
 <template>
-  <b-container class="bucket-info" fluid>
-    <b-row class="h-100" align-v="center">
-      <b-col class="goals">Set your own goals.</b-col>
-      
-      <b-col class="tracking">Track, update and share your goals.</b-col>
-
-      <b-col class="inspiration">Get inspiration from more than 200 different categories.</b-col>
-
-      <b-col class="community">Share your experiences with the bucket-list community.</b-col>
-
-    </b-row>
-  </b-container>
+  <div class="bucket-info flex items-center w-screen h-28 text-center">
+    <div class="flex-1 goals">Set your own goals.</div>
+    <div class="flex-1 tracking">Track, update and share your goals.</div>
+    <div class="flex-1 inspiration">Get inspiration from more than 200 different categories.</div>
+    <div class="flex-1 community">Share your experiences with the bucket-list community.</div>
+  </div>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-export default Vue.extend({
-  name: "index-information",
-})
+<script setup lang="ts">
 </script>
 
 <style scoped>
