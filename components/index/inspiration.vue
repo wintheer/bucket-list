@@ -3,9 +3,12 @@
     <h2>{{ header }}</h2>
     <Splide :options="splideOptions">
       <SplideSlide v-for="(image, index) in images" :key="index">
-        <BCard class="rounded-corner" :img-src="image.src" :img-alt="image.alt">
+        <UCard class="rounded-corner overflow-hidden">
+          <template #header>
+            <img :src="image.src" :alt="image.alt" class="w-full">
+          </template>
           {{ image.text }}
-        </BCard>
+        </UCard>
       </SplideSlide>
     </Splide>
   </div>
@@ -43,9 +46,5 @@ const splideOptions = {
 
 h2 {
 	margin: 1rem 4rem;
-}
-    
-.card-body {
-	padding: 5px
 }
 </style>

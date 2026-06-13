@@ -10,9 +10,9 @@
         </SplideSlide>
       </Splide>
       <IndexInformation />
-      <div class="container">
+      <div class="container mx-auto">
         <div class="text-center">
-          <BButton class="m-4" size="lg">Start your journey now</BButton>
+          <UButton class="m-4" size="lg">Start your journey now</UButton>
         </div>
       </div>
       <IndexInspiration style="margin-top: 4rem" header="Inspiration" />

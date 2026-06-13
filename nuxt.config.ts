@@ -23,12 +23,11 @@ export default defineNuxtConfig({
   },
 
   css: [
-    'bootstrap/dist/css/bootstrap.min.css',
     '@splidejs/splide/dist/css/splide.min.css'
   ],
 
   modules: [
-    'bootstrap-vue-next/nuxt',
+    '@nuxt/ui',
   ],
 
   typescript: {
