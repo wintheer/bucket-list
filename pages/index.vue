@@ -6,58 +6,39 @@
       </div>
       <Splide :options="splideOptions">
         <SplideSlide v-for="(image, index) in images" :key="index">
-          <img class="image-fill" :src="image.src" alt="image.path">
+          <img class="image-fill" :src="image.src" :alt="image.alt">
         </SplideSlide>
       </Splide>
-
-      <Information/>
-
+      <IndexInformation />
       <div class="container">
         <div class="text-center">
-          <b-button class="m-4" size="lg" text-center>Start your journey now</b-button>
+          <BButton class="m-4" size="lg">Start your journey now</BButton>
         </div>
       </div>
-
-      <Inspiration style="marginTop: 4rem" :header="'Inspiration'"/>
+      <IndexInspiration style="margin-top: 4rem" header="Inspiration" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { Splide, SplideSlide } from '@splidejs/vue-splide';
-import '@splidejs/splide/dist/css/themes/splide-default.min.css'
-import Information from '../components/index/information.vue';
-import Inspiration from '../components/index/inspiration.vue';
+<script setup lang="ts">
+import { Splide, SplideSlide } from '@splidejs/vue-splide'
 
-export default Vue.extend({
-  components: {
-    Splide,
-    SplideSlide,
-    Information,
-    Inspiration,
-  },
-  data() {
-    return {
-      images: [
-        { src: require("../assets/perform.jpg") },
-        { src: require("../assets/cliff-dive.jpg") },
-        { src: require("../assets/piano.jpg") },
-        
-      ],
-      splideOptions: {
-        height: "50vh",
-        gap: "1rem",
-        type: 'loop',
-        focus: 'center',
-        perPage: 3,
-        perMove: 1, 
-        autoplay: true,
-        autoWidth: true,
-      }
-    };
-  },
-});
+const images = [
+  { src: '/assets/perform.jpg', alt: 'performing' },
+  { src: '/assets/cliff-dive.jpg', alt: 'cliff diving' },
+  { src: '/assets/piano.jpg', alt: 'playing piano' },
+]
+
+const splideOptions = {
+  height: '50vh',
+  gap: '1rem',
+  type: 'loop',
+  focus: 'center',
+  perPage: 3,
+  perMove: 1,
+  autoplay: true,
+  autoWidth: true,
+}
 </script>
 
 <style scoped>
