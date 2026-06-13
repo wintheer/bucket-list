@@ -205,6 +205,40 @@
         </button>
       </div>
 
+      <!-- Linked journal entries -->
+      <div v-if="linkedJournalEntries.length" class="mb-8">
+        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Journal</p>
+        <!-- Journal name badges -->
+        <div v-if="linkedJournals.length" class="flex flex-wrap gap-2 mb-4">
+          <NuxtLink
+            v-for="j in linkedJournals"
+            :key="j.id"
+            to="/journal"
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            :style="{ borderColor: journalHex(j.color), color: journalHex(j.color) }"
+          >
+            <span class="w-1.5 h-1.5 rounded-full shrink-0" :style="{ backgroundColor: journalHex(j.color) }" />
+            {{ j.name }}
+          </NuxtLink>
+        </div>
+        <!-- Entry previews -->
+        <div class="space-y-3">
+          <div
+            v-for="entry in linkedJournalEntries"
+            :key="entry.id"
+            class="pl-4 border-l-2 py-1"
+            :style="{ borderLeftColor: journalHex(journalStore.journals.find(j => j.id === entry.journalId)?.color) }"
+          >
+            <p class="text-xs text-gray-400 mb-1">{{ formatDate(entry.createdAt) }}</p>
+            <p v-if="entry.title" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-0.5">{{ entry.title }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 whitespace-pre-wrap">{{ entry.text }}</p>
+            <div v-if="entry.moodWords.length" class="flex flex-wrap gap-2 mt-1.5">
+              <span v-for="word in entry.moodWords" :key="word" class="text-xs text-gray-400">{{ word }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Related dreams -->
       <div class="mb-8">
         <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Related dreams</p>
@@ -289,16 +323,19 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBucketListStore } from '~/stores/bucketList'
+import { useJournalStore } from '~/stores/journal'
 import { CATEGORIES, STATUS_CONFIG, PRIORITY_CONFIG } from '~/types/bucket'
+import { JOURNAL_COLORS } from '~/types/journal'
 import type { ItemStatus, Note, JournalEntry, BucketItem } from '~/types/bucket'
 
 const route = useRoute()
 const router = useRouter()
 const store = useBucketListStore()
+const journalStore = useJournalStore()
 const toast = useToast()
 const { fire: fireConfetti } = useConfetti()
 
-onMounted(() => store.load())
+onMounted(() => { store.load(); journalStore.load(); journalStore.loadJournals() })
 
 const id = route.params.id as string
 const item = computed(() => store.getById(id))
@@ -318,6 +355,27 @@ const statusOptions = (Object.keys(STATUS_CONFIG) as ItemStatus[]).map(k => ({
 const catIcon = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.icon ?? 'i-lucide-tag')
 const catLabel = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.label ?? '')
 const catColor = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.color ?? 'text-gray-500')
+
+const linkedJournalEntries = computed(() =>
+  journalStore.entries.filter(e => e.linkedGoalIds.includes(id))
+)
+
+const linkedJournals = computed(() => {
+  const seen = new Set<string>()
+  const result: { id: string; name: string; color: string }[] = []
+  for (const entry of linkedJournalEntries.value) {
+    const j = entry.journalId ? journalStore.journals.find(j => j.id === entry.journalId) : null
+    if (j && !seen.has(j.id)) {
+      seen.add(j.id)
+      result.push(j)
+    }
+  }
+  return result
+})
+
+function journalHex(color?: string) {
+  return JOURNAL_COLORS.find(c => c.value === color)?.hex ?? '#a78bfa'
+}
 
 function daysSince(iso: string) {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)

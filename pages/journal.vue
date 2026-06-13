@@ -154,7 +154,8 @@
 
           <!-- Feeling word chips -->
           <Transition name="fade-down">
-            <div v-if="form.mood" class="flex flex-wrap gap-2">
+            <div v-if="form.mood" class="flex flex-wrap gap-2 items-center">
+              <!-- Suggested words -->
               <button
                 v-for="word in currentMoodWords"
                 :key="word"
@@ -164,7 +165,25 @@
               >
                 {{ word }}
               </button>
-              <span v-if="form.moodWords.length >= 3" class="self-center text-xs text-gray-400">max 3</span>
+              <!-- Custom words -->
+              <span
+                v-for="word in customWords"
+                :key="word"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+                :class="getWordClass(word, true, form.mood)"
+              >
+                {{ word }}
+                <button class="opacity-60 hover:opacity-100 transition-opacity leading-none" @click="removeWord(word)">×</button>
+              </span>
+              <!-- Custom word input -->
+              <input
+                v-model="customWordInput"
+                type="text"
+                placeholder="your own..."
+                class="px-3 py-1 rounded-full text-xs border border-dashed border-gray-300 dark:border-gray-600 bg-transparent text-gray-500 dark:text-gray-400 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 w-24 transition-colors"
+                @keydown.enter.prevent="addCustomWord"
+                @keydown.188.prevent="addCustomWord"
+              />
             </div>
           </Transition>
 
@@ -179,7 +198,8 @@
             ref="textareaRef"
             v-model="form.text"
             placeholder="What's on your mind?"
-            class="w-full resize-none bg-transparent text-gray-800 dark:text-gray-200 text-base leading-relaxed placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none min-h-45"
+            class="w-full resize-none bg-transparent text-gray-800 dark:text-gray-200 text-base leading-relaxed placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none min-h-45 overflow-hidden"
+            @input="autoResize"
           />
 
           <!-- Link to goals -->
@@ -205,7 +225,7 @@
                 @focus="showGoalDropdown = true"
                 @blur="hideGoalDropdown"
               />
-              <div v-if="showGoalDropdown && goalSuggestions.length" class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden">
+              <div v-if="showGoalDropdown && goalSuggestions.length" class="absolute z-20 w-full bottom-full mb-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-52 overflow-y-auto">
                 <button
                   v-for="s in goalSuggestions"
                   :key="s.id"
@@ -261,36 +281,63 @@
         <div class="space-y-3 mb-10">
           <div
             v-for="entry in monthEntries"
+            v-show="editingId !== entry.id"
             :key="entry.id"
-            class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 cursor-pointer border-l-4 transition-colors hover:border-gray-200 dark:hover:border-gray-700"
-            :class="editingId === entry.id ? 'ring-2 ring-primary-200 dark:ring-primary-900' : ''"
+            class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 border-l-4 transition-all duration-200"
+            :class="[
+              expandedId === entry.id ? 'shadow-md' : '',
+            ]"
             :style="{ borderLeftColor: getMoodHexColor(entry.mood) }"
-            @click="openEntry(entry)"
           >
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs text-gray-400">{{ formatDate(entry.createdAt) }}</span>
-              <div class="flex items-center gap-3">
-                <!-- Journal badge (only in All view) -->
-                <span v-if="activeJournalId === null && entryJournal(entry)" class="flex items-center gap-1 text-xs text-gray-400">
-                  <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: journalHex(entryJournal(entry)?.color) }" />
-                  {{ entryJournal(entry)?.name }}
-                </span>
-                <div v-if="entry.mood" class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full shrink-0" :style="{ backgroundColor: getMoodHexColor(entry.mood) }" />
-                  <span class="text-xs text-gray-400">{{ MOOD_CONFIG[entry.mood].label }}</span>
+            <!-- Collapsed / always-visible header row -->
+            <div
+              class="p-5 cursor-pointer select-none"
+              @click="expandedId = expandedId === entry.id ? null : entry.id"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs text-gray-400">{{ formatDate(entry.createdAt) }}</span>
+                <div class="flex items-center gap-3">
+                  <span v-if="activeJournalId === null && entryJournal(entry)" class="flex items-center gap-1 text-xs text-gray-400">
+                    <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: journalHex(entryJournal(entry)?.color) }" />
+                    {{ entryJournal(entry)?.name }}
+                  </span>
+                  <div v-if="entry.mood" class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full shrink-0" :style="{ backgroundColor: getMoodHexColor(entry.mood) }" />
+                    <span class="text-xs text-gray-400">{{ MOOD_CONFIG[entry.mood].label }}</span>
+                  </div>
+                  <UIcon
+                    :name="expandedId === entry.id ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                    class="size-3.5 text-gray-300 dark:text-gray-600 transition-transform duration-200"
+                  />
                 </div>
               </div>
+              <p v-if="entry.title" class="font-semibold text-gray-900 dark:text-white mb-1">{{ entry.title }}</p>
+              <p
+                class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap"
+                :class="expandedId !== entry.id ? 'line-clamp-3' : ''"
+              >{{ entry.text }}</p>
+              <!-- Mood words + linked dreams — always visible -->
+              <div v-if="entry.moodWords.length || entry.linkedGoalIds.length" class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800/80">
+                <span v-for="word in entry.moodWords" :key="word" class="text-xs text-gray-400">{{ word }}</span>
+                <span v-if="entry.moodWords.length && entry.linkedGoalIds.length" class="text-gray-300 dark:text-gray-700 text-xs">·</span>
+                <span v-if="entry.linkedGoalIds.length" class="flex items-center gap-1 text-xs text-gray-400">
+                  <UIcon name="i-lucide-link" class="size-3" />
+                  {{ entry.linkedGoalIds.length }} {{ entry.linkedGoalIds.length === 1 ? 'dream' : 'dreams' }}
+                </span>
+              </div>
             </div>
-            <p v-if="entry.title" class="font-semibold text-gray-900 dark:text-white mb-1">{{ entry.title }}</p>
-            <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">{{ entry.text }}</p>
-            <div v-if="entry.moodWords.length || entry.linkedGoalIds.length" class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800/80">
-              <span v-for="word in entry.moodWords" :key="word" class="text-xs text-gray-400">{{ word }}</span>
-              <span v-if="entry.moodWords.length && entry.linkedGoalIds.length" class="text-gray-300 dark:text-gray-700 text-xs">·</span>
-              <span v-if="entry.linkedGoalIds.length" class="flex items-center gap-1 text-xs text-gray-400">
-                <UIcon name="i-lucide-link" class="size-3" />
-                {{ entry.linkedGoalIds.length }} {{ entry.linkedGoalIds.length === 1 ? 'dream' : 'dreams' }}
-              </span>
-            </div>
+
+            <!-- Expanded footer: Edit button only -->
+            <Transition name="expand">
+              <div
+                v-if="expandedId === entry.id"
+                class="px-5 pb-5 border-t border-gray-50 dark:border-gray-800/80 pt-3"
+              >
+                <UButton size="xs" variant="soft" color="neutral" icon="i-lucide-pencil" @click.stop="openEntry(entry)">
+                  Edit
+                </UButton>
+              </div>
+            </Transition>
           </div>
         </div>
       </template>
@@ -328,6 +375,13 @@ import { CATEGORIES } from '~/types/bucket'
 const store = useJournalStore()
 const bucketStore = useBucketListStore()
 const textareaRef = ref<HTMLTextAreaElement>()
+
+function autoResize() {
+  const el = textareaRef.value
+  if (!el) return
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
 const newJournalInputRef = ref<HTMLInputElement>()
 
 onMounted(async () => {
@@ -392,6 +446,7 @@ async function doDeleteJournal() {
 // Compose state
 const composing = ref(false)
 const editingId = ref<string | null>(null)
+const expandedId = ref<string | null>(null)
 const editingCreatedAt = ref('')
 const saving = ref(false)
 const showComposerJournalPicker = ref(false)
@@ -465,6 +520,7 @@ function startNewEntry() {
   nextTick(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     textareaRef.value?.focus()
+    autoResize()
   })
 }
 
@@ -477,10 +533,12 @@ function openEntry(entry: PersonalEntry) {
   form.journalId = entry.journalId ?? store.defaultJournalId
   editingId.value = entry.id
   editingCreatedAt.value = entry.createdAt
+  expandedId.value = null
   composing.value = true
   nextTick(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     textareaRef.value?.focus()
+    autoResize()
   })
 }
 
@@ -493,6 +551,9 @@ function cancel() {
   form.mood = undefined
   form.moodWords = []
   form.linkedGoalIds = []
+  nextTick(() => {
+    if (textareaRef.value) textareaRef.value.style.height = ''
+  })
 }
 
 async function save() {
@@ -534,13 +595,34 @@ function selectMood(score: MoodScore) {
   }
 }
 
+const customWordInput = ref('')
+
+const customWords = computed(() =>
+  form.moodWords.filter(w => !currentMoodWords.value.includes(w))
+)
+
 function toggleWord(word: string) {
   const idx = form.moodWords.indexOf(word)
   if (idx !== -1) {
     form.moodWords.splice(idx, 1)
-  } else if (form.moodWords.length < 3) {
+  } else {
     form.moodWords.push(word)
   }
+}
+
+function removeWord(word: string) {
+  const idx = form.moodWords.indexOf(word)
+  if (idx !== -1) form.moodWords.splice(idx, 1)
+}
+
+function addCustomWord() {
+  const word = customWordInput.value.trim().toLowerCase().replace(/[^a-z\s-]/g, '')
+  if (!word || form.moodWords.includes(word)) {
+    customWordInput.value = ''
+    return
+  }
+  form.moodWords.push(word)
+  customWordInput.value = ''
 }
 
 // Helpers
@@ -619,5 +701,20 @@ function getMoodHexColor(mood?: MoodScore): string {
 }
 .fade-down-leave-to {
   opacity: 0;
+}
+
+.expand-enter-active {
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.expand-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.expand-enter-from {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.expand-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

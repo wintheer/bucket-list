@@ -133,6 +133,23 @@
           <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-snug mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">{{ item.title }}</h3>
           <!-- Why — unclamped so cards breathe at different heights -->
           <p v-if="item.why" class="text-sm text-gray-500 dark:text-gray-400 italic leading-relaxed">"{{ item.why }}"</p>
+          <!-- Linked journals -->
+          <div v-if="dreamJournalMap.get(item.id)" class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800/60">
+            <template v-if="dreamJournalMap.get(item.id)!.journals.length">
+              <span
+                v-for="j in dreamJournalMap.get(item.id)!.journals"
+                :key="j.id"
+                class="inline-flex items-center gap-1 text-xs text-gray-400"
+              >
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" :style="{ backgroundColor: journalHex(j.color) }" />
+                {{ j.name }}
+              </span>
+            </template>
+            <span v-else class="inline-flex items-center gap-1 text-xs text-gray-400">
+              <UIcon name="i-lucide-book-open" class="size-3" />
+              {{ dreamJournalMap.get(item.id)!.entryCount }} {{ dreamJournalMap.get(item.id)!.entryCount === 1 ? 'journal entry' : 'journal entries' }}
+            </span>
+          </div>
         </div>
       </NuxtLink>
     </div>
@@ -179,7 +196,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useBucketListStore } from '~/stores/bucketList'
+import { useJournalStore } from '~/stores/journal'
 import { CATEGORIES, STATUS_CONFIG, DISCOVER_PROMPTS } from '~/types/bucket'
+import { JOURNAL_COLORS } from '~/types/journal'
 import type { ItemStatus, ItemCategory, BucketItem } from '~/types/bucket'
 
 type Surprise =
@@ -187,7 +206,8 @@ type Surprise =
   | { type: 'prompt'; title: string; category: ItemCategory }
 
 const store = useBucketListStore()
-onMounted(() => store.load())
+const journalStore = useJournalStore()
+onMounted(() => { store.load(); journalStore.load(); journalStore.loadJournals() })
 
 const activeStatus = ref<ItemStatus | null>(null)
 const activeCategory = ref<ItemCategory | null>(null)
@@ -236,6 +256,29 @@ function categoryColor(cat: ItemCategory) {
 function daysSince(iso: string) {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
 }
+
+function journalHex(color?: string) {
+  return JOURNAL_COLORS.find(c => c.value === color)?.hex ?? '#a78bfa'
+}
+
+// Map from dream ID → { journals: Journal[], entryCount: number }
+const dreamJournalMap = computed(() => {
+  const map = new Map<string, { journals: { id: string; name: string; color: string }[]; entryCount: number }>()
+  for (const entry of journalStore.entries) {
+    for (const goalId of entry.linkedGoalIds) {
+      if (!map.has(goalId)) map.set(goalId, { journals: [], entryCount: 0 })
+      const slot = map.get(goalId)!
+      slot.entryCount++
+      const journal = entry.journalId
+        ? journalStore.journals.find(j => j.id === entry.journalId)
+        : null
+      if (journal && !slot.journals.find(j => j.id === journal.id)) {
+        slot.journals.push(journal)
+      }
+    }
+  }
+  return map
+})
 
 const longWaiting = computed(() =>
   store.items
