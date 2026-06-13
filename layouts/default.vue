@@ -16,6 +16,13 @@
       </div>
 
       <div class="flex items-center gap-3 shrink-0">
+        <button
+          class="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+          :title="colorMode.value === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          @click="toggleColorMode"
+        >
+          <UIcon :name="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" class="size-4" />
+        </button>
         <UButton size="sm" icon="i-lucide-plus" to="/add">Add a dream</UButton>
       </div>
     </nav>
@@ -28,6 +35,11 @@
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const colorMode = useColorMode()
+
+function toggleColorMode() {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 
 const navLinks = [
   { to: '/list',     label: 'My Dreams' },
