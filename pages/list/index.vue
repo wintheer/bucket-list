@@ -22,7 +22,7 @@
     <div v-if="store.items.length > 0" class="mb-8">
       <div class="h-0.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
         <div
-          class="h-full rounded-full transition-all duration-700 ease-out bg-primary-300/70 dark:bg-primary-600/50"
+          class="h-full rounded-full transition-all duration-700 ease-out bg-primary-300/70 dark:bg-primary-600/50 relative overflow-hidden progress-shimmer"
           :style="{ width: `${progressPercent}%` }"
         />
       </div>
@@ -96,7 +96,7 @@
 
     <!-- Empty state -->
     <div v-else-if="filtered.length === 0" class="text-center py-24 text-gray-400">
-      <UIcon name="i-lucide-sparkles" class="size-12 mx-auto mb-4 text-gray-300" />
+      <UIcon name="i-lucide-sparkles" class="size-12 mx-auto mb-4 text-gray-300 float-icon" />
       <p class="text-lg font-medium text-gray-600 dark:text-gray-300">Your story starts here</p>
       <p class="text-sm mt-1">Every great life began with a single dream.</p>
       <UButton class="mt-6" to="/add">Dream something up</UButton>
@@ -105,12 +105,13 @@
     <!-- Masonry -->
     <div v-else class="columns-1 sm:columns-2 lg:columns-3 gap-5">
       <NuxtLink
-        v-for="item in filtered"
+        v-for="(item, i) in filtered"
         :key="item.id"
         :to="`/list/${item.id}`"
-        class="group block break-inside-avoid mb-5"
+        class="group block break-inside-avoid mb-5 dream-card"
+        :style="{ animationDelay: `${Math.min(i, 9) * 60}ms` }"
       >
-        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md transition-all overflow-hidden p-6">
+        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden p-6">
           <!-- Image -->
           <div v-if="item.imageUrl" class="-mx-6 -mt-6 mb-5">
             <img :src="item.imageUrl" :alt="item.title" class="w-full h-44 object-cover">
@@ -129,7 +130,7 @@
             />
           </div>
           <!-- Title -->
-          <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-snug mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{{ item.title }}</h3>
+          <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-snug mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">{{ item.title }}</h3>
           <!-- Why — unclamped so cards breathe at different heights -->
           <p v-if="item.why" class="text-sm text-gray-500 dark:text-gray-400 italic leading-relaxed">"{{ item.why }}"</p>
         </div>
@@ -262,3 +263,47 @@ function pickRandom() {
   showRandom.value = true
 }
 </script>
+
+<style scoped>
+/* Card entrance — blur fades as the dream comes into focus */
+@keyframes dreamIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.dream-card {
+  animation: dreamIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Floating sparkle on empty state */
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-10px) rotate(-4deg); }
+  66%       { transform: translateY(-6px) rotate(3deg); }
+}
+.float-icon {
+  animation: floatIcon 4s ease-in-out infinite;
+}
+
+/* Shimmer sweep on progress bar */
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(400%); }
+}
+.progress-shimmer::after {
+  content: '';
+  position: absolute;
+  inset-y: 0;
+  left: 0;
+  width: 25%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: shimmer 2.4s ease-in-out infinite;
+}
+</style>
