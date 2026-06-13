@@ -19,6 +19,13 @@ export type LifeArea =
   | 'creativity'
   | 'community'
 
+export interface Note {
+  id: string
+  text: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface BucketItem {
   id: string
   title: string
@@ -31,6 +38,7 @@ export interface BucketItem {
   imageUrl?: string
   location?: string
   reflection?: string
+  notes?: Note[]
   createdAt: string
   updatedAt: string
   completedAt?: string

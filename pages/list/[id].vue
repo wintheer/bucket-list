@@ -126,6 +126,56 @@
         Completed on {{ formatDate(item.completedAt) }}
       </div>
 
+      <!-- Notes -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Notes</p>
+          <UButton v-if="notes.length > 0 && !addingNote" size="xs" variant="ghost" color="neutral" icon="i-lucide-plus" @click="startAddNote">
+            Add note
+          </UButton>
+        </div>
+
+        <div class="space-y-3">
+          <div v-for="note in notes" :key="note.id">
+            <!-- View mode -->
+            <div v-if="editingNoteId !== note.id" class="group relative pl-4 border-l-2 border-gray-200 dark:border-gray-700 py-1">
+              <p class="text-xs text-gray-400 mb-1">{{ formatDateTime(note.updatedAt) }}</p>
+              <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{{ note.text }}</p>
+              <div class="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-pencil" @click="startEditNote(note)" />
+                <UButton size="xs" variant="ghost" color="error" icon="i-lucide-trash-2" @click="removeNote(note.id)" />
+              </div>
+            </div>
+            <!-- Edit mode -->
+            <div v-else class="space-y-2">
+              <UTextarea v-model="editingNoteText" :rows="3" autofocus class="w-full" />
+              <div class="flex gap-2">
+                <UButton size="sm" @click="saveEditNote(note.id)">Save</UButton>
+                <UButton size="sm" variant="ghost" color="neutral" @click="editingNoteId = null">Cancel</UButton>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add note form -->
+        <div v-if="addingNote" class="mt-3 space-y-2">
+          <UTextarea v-model="newNoteText" :rows="3" placeholder="Write a note..." autofocus class="w-full" />
+          <div class="flex gap-2">
+            <UButton size="sm" :disabled="!newNoteText.trim()" @click="saveNewNote">Add</UButton>
+            <UButton size="sm" variant="ghost" color="neutral" @click="addingNote = false; newNoteText = ''">Cancel</UButton>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <button
+          v-else-if="notes.length === 0"
+          class="w-full mt-1 py-6 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-500 transition-colors"
+          @click="startAddNote"
+        >
+          + Add a note
+        </button>
+      </div>
+
       <!-- Actions -->
       <div class="flex gap-3 pt-4 border-t border-gray-100">
         <UButton variant="outline" color="neutral" icon="i-lucide-pencil" :to="`/edit/${item.id}`">Edit</UButton>
@@ -162,7 +212,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBucketListStore } from '~/stores/bucketList'
 import { CATEGORIES, STATUS_CONFIG, PRIORITY_CONFIG } from '~/types/bucket'
-import type { ItemStatus } from '~/types/bucket'
+import type { ItemStatus, Note } from '~/types/bucket'
 
 const route = useRoute()
 const router = useRouter()
@@ -193,6 +243,55 @@ const catColor = computed(() => CATEGORIES.find(c => c.value === item.value?.cat
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function formatDateTime(iso: string) {
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+function noteId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2)
+}
+
+const notes = computed(() => item.value?.notes ?? [])
+
+const addingNote = ref(false)
+const newNoteText = ref('')
+const editingNoteId = ref<string | null>(null)
+const editingNoteText = ref('')
+
+function startAddNote() {
+  editingNoteId.value = null
+  newNoteText.value = ''
+  addingNote.value = true
+}
+
+async function saveNewNote() {
+  if (!newNoteText.value.trim()) return
+  const now = new Date().toISOString()
+  const note: Note = { id: noteId(), text: newNoteText.value.trim(), createdAt: now, updatedAt: now }
+  await store.updateItem(id, { notes: [...notes.value, note] })
+  newNoteText.value = ''
+  addingNote.value = false
+}
+
+function startEditNote(note: Note) {
+  addingNote.value = false
+  editingNoteText.value = note.text
+  editingNoteId.value = note.id
+}
+
+async function saveEditNote(noteId: string) {
+  if (!editingNoteText.value.trim()) return
+  const updated = notes.value.map(n =>
+    n.id === noteId ? { ...n, text: editingNoteText.value.trim(), updatedAt: new Date().toISOString() } : n
+  )
+  await store.updateItem(id, { notes: updated })
+  editingNoteId.value = null
+}
+
+async function removeNote(noteId: string) {
+  await store.updateItem(id, { notes: notes.value.filter(n => n.id !== noteId) })
 }
 
 async function setStatus(status: ItemStatus) {
