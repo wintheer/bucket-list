@@ -2,107 +2,28 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { BucketItem, ItemStatus, ItemCategory, LifeArea } from '~/types/bucket'
 
-const STORAGE_KEY = 'bucket-list-items'
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2)
-}
-
-const SEED_ITEMS: BucketItem[] = [
-  {
-    id: 'seed-1',
-    title: 'Hike the Camino de Santiago',
-    description: 'Walk the French route across northern Spain over 30+ days.',
-    why: 'I want to experience long solitude, simplicity, and meet people from all over the world with nothing but a backpack.',
-    category: 'travel',
-    lifeArea: 'adventure',
-    status: 'idea',
-    priority: 'near-term',
-    location: 'Spain',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'seed-2',
-    title: 'Learn to play the piano',
-    description: 'Reach a level where I can play a full piece from memory.',
-    why: 'Music gives me a way to express things I cannot put into words.',
-    category: 'skills',
-    lifeArea: 'creativity',
-    status: 'in-progress',
-    priority: 'soon',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'seed-3',
-    title: 'Run a marathon',
-    description: 'Train for and complete a full 42km marathon.',
-    why: 'To prove to myself that I can commit to something hard and see it through.',
-    category: 'health',
-    lifeArea: 'health',
-    status: 'idea',
-    priority: 'someday',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-]
-
 export const useBucketListStore = defineStore('bucketList', () => {
   const items = ref<BucketItem[]>([])
 
-  function load() {
-    if (typeof window === 'undefined') return
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      try {
-        items.value = JSON.parse(raw)
-      } catch {
-        items.value = [...SEED_ITEMS]
-      }
-    } else {
-      items.value = [...SEED_ITEMS]
-      save()
-    }
+  async function load() {
+    items.value = await $fetch<BucketItem[]>('/api/items')
   }
 
-  function save() {
-    if (typeof window === 'undefined') return
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
-  }
-
-  function addItem(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>): BucketItem {
-    const now = new Date().toISOString()
-    const item: BucketItem = {
-      ...data,
-      id: generateId(),
-      createdAt: now,
-      updatedAt: now,
-    }
+  async function addItem(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<BucketItem> {
+    const item = await $fetch<BucketItem>('/api/items', { method: 'POST', body: data })
     items.value.unshift(item)
-    save()
     return item
   }
 
-  function updateItem(id: string, data: Partial<Omit<BucketItem, 'id' | 'createdAt'>>) {
+  async function updateItem(id: string, data: Partial<Omit<BucketItem, 'id' | 'createdAt'>>) {
+    const updated = await $fetch<BucketItem>(`/api/items/${id}`, { method: 'PUT', body: data })
     const idx = items.value.findIndex(i => i.id === id)
-    if (idx === -1) return
-    const now = new Date().toISOString()
-    const existing = items.value[idx]!
-    const updated: BucketItem = { ...existing, ...data, updatedAt: now }
-    if (data.status === 'done' && existing.status !== 'done') {
-      updated.completedAt = now
-    }
-    if (data.status && data.status !== 'done') {
-      updated.completedAt = undefined
-    }
-    items.value[idx] = updated
-    save()
+    if (idx !== -1) items.value[idx] = updated
   }
 
-  function deleteItem(id: string) {
+  async function deleteItem(id: string) {
+    await $fetch(`/api/items/${id}`, { method: 'DELETE' })
     items.value = items.value.filter(i => i.id !== id)
-    save()
   }
 
   function getById(id: string): BucketItem | undefined {

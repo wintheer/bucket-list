@@ -165,8 +165,8 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-function setStatus(status: ItemStatus) {
-  store.updateItem(id, { status })
+async function setStatus(status: ItemStatus) {
+  await store.updateItem(id, { status })
   if (status === 'done' && !item.value?.reflection) {
     setTimeout(() => startReflection(), 300)
   }
@@ -177,13 +177,13 @@ function startReflection() {
   editingReflection.value = true
 }
 
-function saveReflection() {
-  store.updateItem(id, { reflection: reflectionText.value.trim() })
+async function saveReflection() {
+  await store.updateItem(id, { reflection: reflectionText.value.trim() })
   editingReflection.value = false
 }
 
-function doDelete() {
-  store.deleteItem(id)
+async function doDelete() {
+  await store.deleteItem(id)
   router.push('/list')
 }
 </script>

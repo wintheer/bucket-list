@@ -25,8 +25,8 @@ onMounted(() => store.load())
 const id = route.params.id as string
 const item = computed(() => store.getById(id))
 
-function onSubmit(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>) {
-  store.updateItem(id, data)
+async function onSubmit(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>) {
+  await store.updateItem(id, data)
   router.push(`/list/${id}`)
 }
 </script>

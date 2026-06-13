@@ -24,8 +24,8 @@ const prefill = computed(() => ({
   category: (route.query.category as ItemCategory) ?? undefined,
 }))
 
-function onSubmit(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>) {
-  const item = store.addItem(data)
+async function onSubmit(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>) {
+  const item = await store.addItem(data)
   router.push(`/list/${item.id}`)
 }
 </script>

@@ -1,5 +1,4 @@
 export default defineNuxtConfig({
-  ssr: false,
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
 
@@ -19,7 +18,8 @@ export default defineNuxtConfig({
   },
 
   devServer: {
-    port: 8080
+    host: '0.0.0.0',
+    port: 8080,
   },
 
   css: ['~/assets/css/main.css'],
@@ -29,12 +29,22 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
   ],
 
+  runtimeConfig: {
+    mongodbUri: '',
+  },
+
   typescript: {
     strict: true,
     typeCheck: true
   },
 
   vite: {
-    assetsInclude: ['**/*.svg']
+    assetsInclude: ['**/*.svg'],
+    server: {
+      allowedHosts: true,
+      hmr: {
+        clientPort: 443,
+      },
+    },
   }
 })
