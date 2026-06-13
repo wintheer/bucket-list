@@ -17,3 +17,13 @@ export async function getCollection() {
   const db = await getDb()
   return db.collection('items')
 }
+
+export async function getJournalCollection() {
+  const db = await getDb()
+  return db.collection('journal')
+}
+
+export async function getJournalsCollection() {
+  const db = await getDb()
+  return db.collection('journals')
+}
