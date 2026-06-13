@@ -26,6 +26,12 @@ export interface Note {
   updatedAt: string
 }
 
+export interface JournalEntry {
+  id: string
+  text: string
+  createdAt: string
+}
+
 export interface BucketItem {
   id: string
   title: string
@@ -39,6 +45,10 @@ export interface BucketItem {
   location?: string
   reflection?: string
   notes?: Note[]
+  journal?: JournalEntry[]
+  linkedIds?: string[]
+  completedWith?: string
+  completedFeeling?: string
   isPrivate?: boolean
   createdAt: string
   updatedAt: string

@@ -67,6 +67,24 @@
       </div>
     </div>
 
+    <!-- What your dreams reveal -->
+    <div v-if="reveals && store.items.length >= 3" class="mb-12">
+      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">What your dreams reveal</p>
+
+      <div v-if="reveals.archetype" class="mb-6 p-6 rounded-2xl bg-linear-to-br from-primary-50 to-primary-100/50 dark:from-primary-950/30 dark:to-primary-900/10 border border-primary-100 dark:border-primary-900/50">
+        <p class="text-xs font-semibold uppercase tracking-widest text-primary-400 mb-1">Your archetype</p>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ reveals.archetype }}</h3>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
+        Of your {{ store.items.length }} dreams,
+        <span v-if="reveals.topCat" class="font-semibold text-gray-800 dark:text-gray-200"> {{ reveals.topCat.label }}</span>
+        <span v-if="reveals.topCat"> comes up most — {{ reveals.topCatCount }} {{ reveals.topCatCount === 1 ? 'time' : 'times' }}.</span>
+        <span v-if="reveals.topArea"> <span class="font-semibold text-gray-800 dark:text-gray-200">{{ reveals.topArea.label }}</span> is the life area you keep returning to.</span>
+        <span v-if="reveals.oldest && reveals.oldestDays > 90"> Your oldest unfulfilled dream — <span class="italic">"{{ reveals.oldest.title }}"</span> — has been waiting {{ reveals.oldestDays }} days.</span>
+      </p>
+    </div>
+
     <!-- Dreamed this year -->
     <div>
       <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
@@ -99,7 +117,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useBucketListStore } from '~/stores/bucketList'
-import { LIFE_AREAS, STATUS_CONFIG } from '~/types/bucket'
+import { LIFE_AREAS, CATEGORIES, STATUS_CONFIG } from '~/types/bucket'
 
 const store = useBucketListStore()
 const mounted = ref(false)
@@ -136,4 +154,48 @@ const lifeAreaBreakdown = computed(() =>
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
+
+const ARCHETYPES: Record<string, string> = {
+  travel: 'The Explorer',
+  skills: 'The Student',
+  experiences: 'The Seeker',
+  relationships: 'The Connector',
+  creativity: 'The Maker',
+  health: 'The Athlete',
+  career: 'The Builder',
+}
+
+const reveals = computed(() => {
+  if (store.items.length < 3) return null
+
+  const catCounts = store.items.reduce((acc, i) => {
+    acc[i.category] = (acc[i.category] ?? 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  const topCatEntry = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0]
+  const topCat = CATEGORIES.find(c => c.value === topCatEntry?.[0])
+
+  const areaCounts = store.items.reduce((acc, i) => {
+    acc[i.lifeArea] = (acc[i.lifeArea] ?? 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  const topAreaEntry = Object.entries(areaCounts).sort((a, b) => b[1] - a[1])[0]
+  const topArea = LIFE_AREAS.find(a => a.value === topAreaEntry?.[0])
+
+  const oldest = store.items
+    .filter(i => i.status === 'idea')
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0]
+  const oldestDays = oldest
+    ? Math.floor((Date.now() - new Date(oldest.createdAt).getTime()) / 86400000)
+    : 0
+
+  return {
+    topCat,
+    topCatCount: topCatEntry?.[1] ?? 0,
+    topArea,
+    oldest,
+    oldestDays,
+    archetype: topCatEntry ? ARCHETYPES[topCatEntry[0]] : null,
+  }
+})
 </script>
