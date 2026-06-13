@@ -9,7 +9,7 @@
         <div class="absolute inset-0 bg-gray-950/75 backdrop-blur-sm" @click="$emit('close')" />
 
         <div class="relative z-10 w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
-          <div class="h-1.5 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400" />
+          <div class="h-1.5 bg-linear-to-r from-green-400 via-emerald-400 to-teal-400" />
 
           <!-- Step 1: Celebration -->
           <div v-if="step === 1" class="p-8 text-center">

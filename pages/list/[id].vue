@@ -381,7 +381,7 @@ const journal = computed(() => item.value?.journal ?? [])
 const addingJournalEntry = ref(false)
 const newJournalText = ref('')
 
-function entryId() {
+function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
@@ -393,7 +393,7 @@ function startJournalEntry() {
 async function saveJournalEntry() {
   if (!newJournalText.value.trim()) return
   const now = new Date().toISOString()
-  const entry: JournalEntry = { id: entryId(), text: newJournalText.value.trim(), createdAt: now }
+  const entry: JournalEntry = { id: generateId(), text: newJournalText.value.trim(), createdAt: now }
   await store.updateItem(id, { journal: [...journal.value, entry] })
   newJournalText.value = ''
   addingJournalEntry.value = false
@@ -411,9 +411,6 @@ const newNoteText = ref('')
 const editingNoteId = ref<string | null>(null)
 const editingNoteText = ref('')
 
-function noteId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2)
-}
 
 function startAddNote() {
   editingNoteId.value = null
@@ -424,7 +421,7 @@ function startAddNote() {
 async function saveNewNote() {
   if (!newNoteText.value.trim()) return
   const now = new Date().toISOString()
-  const note: Note = { id: noteId(), text: newNoteText.value.trim(), createdAt: now, updatedAt: now }
+  const note: Note = { id: generateId(), text: newNoteText.value.trim(), createdAt: now, updatedAt: now }
   await store.updateItem(id, { notes: [...notes.value, note] })
   newNoteText.value = ''
   addingNote.value = false

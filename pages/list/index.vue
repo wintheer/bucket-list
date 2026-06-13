@@ -178,7 +178,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useBucketListStore } from '~/stores/bucketList'
-import { CATEGORIES, STATUS_CONFIG, PRIORITY_CONFIG, DISCOVER_PROMPTS } from '~/types/bucket'
+import { CATEGORIES, STATUS_CONFIG, DISCOVER_PROMPTS } from '~/types/bucket'
 import type { ItemStatus, ItemCategory, BucketItem } from '~/types/bucket'
 
 type Surprise =

@@ -8,7 +8,7 @@ export const useBucketListStore = defineStore('bucketList', () => {
   const loaded = ref(false)
 
   async function load() {
-    if (loading.value) return
+    if (loaded.value || loading.value) return
     loading.value = true
     try {
       items.value = await $fetch<BucketItem[]>('/api/items')

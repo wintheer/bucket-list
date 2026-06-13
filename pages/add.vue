@@ -238,7 +238,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBucketListStore } from '~/stores/bucketList'
 import { CATEGORIES, LIFE_AREAS, DISCOVER_PROMPTS } from '~/types/bucket'
@@ -257,6 +257,8 @@ const FLAT_PROMPTS = Object.entries(DISCOVER_PROMPTS).flatMap(([cat, prompts]) =
 
 const suggestions = ref<{ title: string; category: ItemCategory }[]>([])
 
+onMounted(shuffleSuggestions)
+
 function shuffleSuggestions() {
   const pool = [...FLAT_PROMPTS]
   const picked: typeof FLAT_PROMPTS = []
@@ -266,8 +268,6 @@ function shuffleSuggestions() {
   }
   suggestions.value = picked
 }
-
-shuffleSuggestions()
 
 function useSuggestion(s: { title: string; category: ItemCategory }) {
   form.title = s.title
