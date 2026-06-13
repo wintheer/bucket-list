@@ -1,22 +1,24 @@
 <template>
   <div>
     <h2>{{ header }}</h2>
-    <Splide :options="splideOptions">
-      <SplideSlide v-for="(image, index) in images" :key="index">
+    <UCarousel
+      :items="images"
+      :ui="{ item: 'basis-1/4' }"
+      class="px-16 overflow-hidden"
+    >
+      <template #default="{ item }">
         <UCard class="rounded-corner overflow-hidden">
           <template #header>
-            <img :src="image.src" :alt="image.alt" class="w-full">
+            <img :src="item.src" :alt="item.alt" class="w-full">
           </template>
-          {{ image.text }}
+          {{ item.text }}
         </UCard>
-      </SplideSlide>
-    </Splide>
+      </template>
+    </UCarousel>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Splide, SplideSlide } from '@splidejs/vue-splide'
-
 defineProps<{
   header: string
 }>()
@@ -27,14 +29,6 @@ const images = [
   { src: 'https://homepages.cae.wisc.edu/~ece533/images/fruits.png', alt: 'fruits', text: 'These are fruits' },
   { src: 'https://homepages.cae.wisc.edu/~ece533/images/goldhill.png', alt: 'goldhill', text: 'This is a hill' },
 ]
-
-const splideOptions = {
-  perPage: 4,
-  perMove: 1,
-  gap: '1rem',
-  padding: '4rem',
-  arrows: false,
-}
 </script>
 
 <style scoped>

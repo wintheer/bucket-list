@@ -22,9 +22,7 @@ export default defineNuxtConfig({
     port: 8080
   },
 
-  css: [
-    '@splidejs/splide/dist/css/splide.min.css'
-  ],
+  css: ['~/assets/css/main.css'],
 
   modules: [
     '@nuxt/ui',
