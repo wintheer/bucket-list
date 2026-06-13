@@ -44,6 +44,35 @@
               autofocus
               @keydown.enter="step1Next"
             />
+
+            <!-- Suggestions -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Or try one of these</p>
+                <button
+                  class="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  @click="shuffleSuggestions"
+                >
+                  <UIcon name="i-lucide-refresh-cw" class="size-3" /> Shuffle
+                </button>
+              </div>
+              <div class="flex flex-col gap-2">
+                <button
+                  v-for="s in suggestions"
+                  :key="s.title"
+                  class="flex items-center gap-3 text-sm text-left px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-primary-300 dark:hover:border-primary-700 hover:text-gray-900 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all"
+                  @click="useSuggestion(s)"
+                >
+                  <UIcon
+                    :name="CATEGORIES.find(c => c.value === s.category)?.icon ?? 'i-lucide-sparkles'"
+                    class="size-4 shrink-0"
+                    :class="CATEGORIES.find(c => c.value === s.category)?.color ?? 'text-gray-400'"
+                  />
+                  {{ s.title }}
+                </button>
+              </div>
+            </div>
+
             <div class="flex items-center justify-between">
               <UButton variant="ghost" color="neutral" to="/list">Cancel</UButton>
               <UButton
@@ -160,19 +189,36 @@
                 :class="form.priority === p.value
                   ? 'border-primary-400 bg-primary-50 dark:bg-primary-950'
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800'"
-                @click="submit(p.value)"
+                @click="form.priority = p.value"
               >
-                <UIcon
-                  :name="submitting && form.priority === p.value ? 'i-lucide-loader-2' : p.icon"
-                  class="size-5 mt-0.5 shrink-0"
-                  :class="[p.color, submitting && form.priority === p.value ? 'animate-spin' : '']"
-                />
+                <UIcon :name="p.icon" class="size-5 mt-0.5 shrink-0" :class="p.color" />
                 <div>
                   <p class="font-semibold text-gray-900 dark:text-white">{{ p.label }}</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">{{ p.description }}</p>
                 </div>
               </button>
             </div>
+
+            <Transition name="fade-up">
+              <div v-if="form.priority" class="space-y-4 pt-2">
+                <div class="flex items-center gap-3 py-3 px-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                  <UToggle v-model="form.isPrivate" />
+                  <div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Keep this private</p>
+                    <p class="text-xs text-gray-400">Public goals can inspire others in the discover section</p>
+                  </div>
+                </div>
+                <UButton
+                  size="lg"
+                  :loading="submitting"
+                  class="w-full justify-center"
+                  @click="submit"
+                >
+                  Add to my list
+                </UButton>
+              </div>
+            </Transition>
+
             <div class="flex items-center justify-start">
               <UButton variant="ghost" color="neutral" :disabled="submitting" @click="back">Back</UButton>
             </div>
@@ -188,7 +234,7 @@
 import { ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBucketListStore } from '~/stores/bucketList'
-import { CATEGORIES, LIFE_AREAS } from '~/types/bucket'
+import { CATEGORIES, LIFE_AREAS, DISCOVER_PROMPTS } from '~/types/bucket'
 import type { ItemCategory, ItemPriority, LifeArea, ItemStatus } from '~/types/bucket'
 
 const route = useRoute()
@@ -197,6 +243,29 @@ const store = useBucketListStore()
 const toast = useToast()
 
 const TOTAL_STEPS = 5
+
+const FLAT_PROMPTS = Object.entries(DISCOVER_PROMPTS).flatMap(([cat, prompts]) =>
+  prompts.map(p => ({ title: p, category: cat as ItemCategory }))
+)
+
+const suggestions = ref<{ title: string; category: ItemCategory }[]>([])
+
+function shuffleSuggestions() {
+  const pool = [...FLAT_PROMPTS]
+  const picked: typeof FLAT_PROMPTS = []
+  for (let i = 0; i < 3 && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length)
+    picked.push(pool.splice(idx, 1)[0]!)
+  }
+  suggestions.value = picked
+}
+
+shuffleSuggestions()
+
+function useSuggestion(s: { title: string; category: ItemCategory }) {
+  form.title = s.title
+  if (!form.category) form.category = s.category
+}
 
 const PRIORITIES: { value: ItemPriority; label: string; description: string; icon: string; color: string }[] = [
   {
@@ -228,6 +297,7 @@ const form = reactive({
   category: (route.query.category as ItemCategory) ?? ('' as ItemCategory),
   lifeArea: '' as LifeArea,
   priority: '' as ItemPriority,
+  isPrivate: false,
 })
 
 const step = ref(1)
@@ -259,9 +329,8 @@ function selectLifeArea(area: LifeArea) {
   setTimeout(() => advance(), 160)
 }
 
-async function submit(priority: ItemPriority) {
-  if (submitting.value) return
-  form.priority = priority
+async function submit() {
+  if (submitting.value || !form.priority) return
   submitting.value = true
   try {
     const item = await store.addItem({
@@ -272,12 +341,12 @@ async function submit(priority: ItemPriority) {
       lifeArea: form.lifeArea,
       priority: form.priority,
       status: 'idea' as ItemStatus,
+      isPrivate: form.isPrivate,
     })
     router.push(`/list/${item.id}`)
   } catch {
     toast.add({ title: 'Something went wrong', color: 'error' })
     submitting.value = false
-    form.priority = '' as ItemPriority
   }
 }
 </script>
@@ -304,5 +373,14 @@ async function submit(priority: ItemPriority) {
 .slide-back-leave-to {
   transform: translateX(32px);
   opacity: 0;
+}
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: all 0.2s ease;
+}
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 </style>

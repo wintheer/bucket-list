@@ -176,8 +176,18 @@
         </button>
       </div>
 
+      <!-- Privacy -->
+      <div class="flex items-center gap-3 py-4 border-t border-gray-100 dark:border-gray-800">
+        <UIcon :name="item.isPrivate ? 'i-lucide-lock' : 'i-lucide-globe'" class="size-4 text-gray-400 shrink-0" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.isPrivate ? 'Private goal' : 'Public goal' }}</p>
+          <p class="text-xs text-gray-400">{{ item.isPrivate ? 'Only visible to you' : 'Title can inspire others in discover' }}</p>
+        </div>
+        <UToggle :model-value="!item.isPrivate" @update:model-value="togglePrivacy" />
+      </div>
+
       <!-- Actions -->
-      <div class="flex gap-3 pt-4 border-t border-gray-100">
+      <div class="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
         <UButton variant="outline" color="neutral" icon="i-lucide-pencil" :to="`/edit/${item.id}`">Edit</UButton>
         <UButton variant="ghost" color="error" icon="i-lucide-trash-2" class="ml-auto" @click="confirmDelete = true">Delete</UButton>
       </div>
@@ -329,6 +339,10 @@ function onCelebrationReflect() {
 async function saveReflection() {
   await store.updateItem(id, { reflection: reflectionText.value.trim() })
   editingReflection.value = false
+}
+
+async function togglePrivacy() {
+  await store.updateItem(id, { isPrivate: !item.value?.isPrivate })
 }
 
 async function doDelete() {

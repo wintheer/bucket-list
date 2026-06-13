@@ -53,6 +53,14 @@
       </div>
     </UFormField>
 
+    <div class="flex items-center gap-3 py-4 border-t border-gray-100 dark:border-gray-800">
+      <UToggle v-model="form.isPrivate" />
+      <div>
+        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Keep this private</p>
+        <p class="text-xs text-gray-400">Public goals can inspire others in the discover section</p>
+      </div>
+    </div>
+
     <div class="flex gap-3 pt-2">
       <UButton type="submit" size="lg" :loading="saving">
         {{ isEditing ? 'Save changes' : 'Add to list' }}
@@ -90,6 +98,7 @@ const form = reactive({
   location: props.initial?.location ?? '',
   imageUrl: props.initial?.imageUrl ?? '',
   reflection: props.initial?.reflection ?? '',
+  isPrivate: props.initial?.isPrivate ?? false,
 })
 
 const categoryOptions = CATEGORIES.map(c => ({ label: c.label, value: c.value }))
@@ -111,6 +120,7 @@ async function handleSubmit() {
     location: form.location.trim() || undefined,
     imageUrl: form.imageUrl.trim() || undefined,
     reflection: form.reflection.trim() || undefined,
+    isPrivate: form.isPrivate,
     completedAt: props.initial?.completedAt,
   })
   saving.value = false
