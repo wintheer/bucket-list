@@ -1,31 +1,308 @@
 <template>
-  <div class="max-w-6xl mx-auto px-6 py-10">
-    <NuxtLink to="/list" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8">
-      <UIcon name="i-lucide-arrow-left" class="size-4" /> Back to list
-    </NuxtLink>
-    <h1 class="text-2xl font-bold text-gray-900 mb-8">Add to your bucket list</h1>
-    <BucketItemForm :initial="prefill" @submit="onSubmit" @cancel="router.push('/list')" />
+  <div class="min-h-[calc(100vh-64px)] flex flex-col">
+    <!-- Progress bar -->
+    <div class="h-0.5 bg-gray-100 dark:bg-gray-800">
+      <div
+        class="h-full bg-primary-400 transition-[width] duration-500 ease-out"
+        :style="{ width: `${(step / TOTAL_STEPS) * 100}%` }"
+      />
+    </div>
+
+    <div class="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <div class="w-full max-w-xl">
+
+        <!-- Step dots -->
+        <div class="flex justify-center gap-1.5 mb-10">
+          <div
+            v-for="i in TOTAL_STEPS"
+            :key="i"
+            class="rounded-full transition-all duration-300"
+            :class="[
+              i === step  ? 'w-6 h-2 bg-primary-400' :
+              i < step    ? 'w-2 h-2 bg-primary-200 dark:bg-primary-800' :
+                            'w-2 h-2 bg-gray-200 dark:bg-gray-700'
+            ]"
+          />
+        </div>
+
+        <Transition :name="direction === 'forward' ? 'slide-fwd' : 'slide-back'" mode="out-in">
+
+          <!-- Step 1: Title -->
+          <div v-if="step === 1" key="step1" class="space-y-8">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                What do you want to do?
+              </h1>
+              <p class="text-gray-500 dark:text-gray-400">
+                Write it as if telling a friend about a dream.
+              </p>
+            </div>
+            <UInput
+              v-model="form.title"
+              size="xl"
+              placeholder="Hike the Camino de Santiago..."
+              autofocus
+              @keydown.enter="step1Next"
+            />
+            <div class="flex items-center justify-between">
+              <UButton variant="ghost" color="neutral" to="/list">Cancel</UButton>
+              <UButton
+                size="lg"
+                trailing-icon="i-lucide-arrow-right"
+                :disabled="!form.title.trim()"
+                @click="step1Next"
+              >
+                Next
+              </UButton>
+            </div>
+          </div>
+
+          <!-- Step 2: Why -->
+          <div v-else-if="step === 2" key="step2" class="space-y-8">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                Why does this matter?
+              </h1>
+              <p class="text-gray-500 dark:text-gray-400">
+                The clearer your reason, the more likely you'll actually do it.
+              </p>
+            </div>
+            <UTextarea
+              v-model="form.why"
+              :rows="4"
+              placeholder="Because life is short and I've always wanted to feel what it's like to..."
+              autofocus
+            />
+            <div class="flex items-center justify-between">
+              <UButton variant="ghost" color="neutral" @click="back">Back</UButton>
+              <UButton
+                size="lg"
+                trailing-icon="i-lucide-arrow-right"
+                :disabled="!form.why.trim()"
+                @click="advance"
+              >
+                Next
+              </UButton>
+            </div>
+          </div>
+
+          <!-- Step 3: Category -->
+          <div v-else-if="step === 3" key="step3" class="space-y-8">
+            <div class="text-center">
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                What kind of experience?
+              </h1>
+              <p class="text-gray-500 dark:text-gray-400">Pick the one that fits best.</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <button
+                v-for="cat in CATEGORIES"
+                :key="cat.value"
+                type="button"
+                class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-center focus:outline-none"
+                :class="form.category === cat.value
+                  ? 'border-primary-400 bg-primary-50 dark:bg-primary-950'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800'"
+                @click="selectCategory(cat.value)"
+              >
+                <UIcon :name="cat.icon" class="size-6" :class="cat.color" />
+                <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ cat.label }}</span>
+              </button>
+            </div>
+            <div class="flex items-center justify-start">
+              <UButton variant="ghost" color="neutral" @click="back">Back</UButton>
+            </div>
+          </div>
+
+          <!-- Step 4: Life Area -->
+          <div v-else-if="step === 4" key="step4" class="space-y-8">
+            <div class="text-center">
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                Which part of your life?
+              </h1>
+              <p class="text-gray-500 dark:text-gray-400">Which area of your life does this feed?</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <button
+                v-for="area in LIFE_AREAS"
+                :key="area.value"
+                type="button"
+                class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-center focus:outline-none"
+                :class="form.lifeArea === area.value
+                  ? 'border-primary-400 bg-primary-50 dark:bg-primary-950'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800'"
+                @click="selectLifeArea(area.value)"
+              >
+                <UIcon :name="area.icon" class="size-6 text-gray-500 dark:text-gray-400" />
+                <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ area.label }}</span>
+              </button>
+            </div>
+            <div class="flex items-center justify-start">
+              <UButton variant="ghost" color="neutral" @click="back">Back</UButton>
+            </div>
+          </div>
+
+          <!-- Step 5: When / Priority -->
+          <div v-else-if="step === 5" key="step5" class="space-y-8">
+            <div class="text-center">
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                When do you see this happening?
+              </h1>
+              <p class="text-gray-500 dark:text-gray-400">Be honest with yourself.</p>
+            </div>
+            <div class="space-y-3">
+              <button
+                v-for="p in PRIORITIES"
+                :key="p.value"
+                type="button"
+                :disabled="submitting"
+                class="w-full flex items-start gap-4 p-5 rounded-xl border-2 transition-all text-left focus:outline-none disabled:opacity-60"
+                :class="form.priority === p.value
+                  ? 'border-primary-400 bg-primary-50 dark:bg-primary-950'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800'"
+                @click="submit(p.value)"
+              >
+                <UIcon
+                  :name="submitting && form.priority === p.value ? 'i-lucide-loader-2' : p.icon"
+                  class="size-5 mt-0.5 shrink-0"
+                  :class="[p.color, submitting && form.priority === p.value ? 'animate-spin' : '']"
+                />
+                <div>
+                  <p class="font-semibold text-gray-900 dark:text-white">{{ p.label }}</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">{{ p.description }}</p>
+                </div>
+              </button>
+            </div>
+            <div class="flex items-center justify-start">
+              <UButton variant="ghost" color="neutral" :disabled="submitting" @click="back">Back</UButton>
+            </div>
+          </div>
+
+        </Transition>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
-import { computed, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useBucketListStore } from '~/stores/bucketList'
-import type { BucketItem, ItemCategory } from '~/types/bucket'
+import { CATEGORIES, LIFE_AREAS } from '~/types/bucket'
+import type { ItemCategory, ItemPriority, LifeArea, ItemStatus } from '~/types/bucket'
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 const store = useBucketListStore()
-onMounted(() => store.load())
+const toast = useToast()
 
-const prefill = computed(() => ({
+const TOTAL_STEPS = 5
+
+const PRIORITIES: { value: ItemPriority; label: string; description: string; icon: string; color: string }[] = [
+  {
+    value: 'soon',
+    label: 'Soon',
+    description: "I'm actively planning this or working on it now.",
+    icon: 'i-lucide-flame',
+    color: 'text-orange-500',
+  },
+  {
+    value: 'near-term',
+    label: 'Near-term',
+    description: "I'd like to do this within the next year or two.",
+    icon: 'i-lucide-calendar',
+    color: 'text-blue-500',
+  },
+  {
+    value: 'someday',
+    label: 'Someday',
+    description: "A dream I'm holding onto. The timing isn't right yet.",
+    icon: 'i-lucide-cloud',
+    color: 'text-gray-400',
+  },
+]
+
+const form = reactive({
   title: (route.query.title as string) ?? '',
-  category: (route.query.category as ItemCategory) ?? undefined,
-}))
+  why: '',
+  category: (route.query.category as ItemCategory) ?? ('' as ItemCategory),
+  lifeArea: '' as LifeArea,
+  priority: '' as ItemPriority,
+})
 
-async function onSubmit(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>) {
-  const item = await store.addItem(data)
-  router.push(`/list/${item.id}`)
+const step = ref(1)
+const direction = ref<'forward' | 'back'>('forward')
+const submitting = ref(false)
+
+function advance() {
+  direction.value = 'forward'
+  step.value++
+}
+
+function back() {
+  direction.value = 'back'
+  step.value--
+}
+
+function step1Next() {
+  if (!form.title.trim()) return
+  advance()
+}
+
+function selectCategory(cat: ItemCategory) {
+  form.category = cat
+  setTimeout(() => advance(), 160)
+}
+
+function selectLifeArea(area: LifeArea) {
+  form.lifeArea = area
+  setTimeout(() => advance(), 160)
+}
+
+async function submit(priority: ItemPriority) {
+  if (submitting.value) return
+  form.priority = priority
+  submitting.value = true
+  try {
+    const item = await store.addItem({
+      title: form.title.trim(),
+      why: form.why.trim(),
+      description: '',
+      category: form.category,
+      lifeArea: form.lifeArea,
+      priority: form.priority,
+      status: 'idea' as ItemStatus,
+    })
+    router.push(`/list/${item.id}`)
+  } catch {
+    toast.add({ title: 'Something went wrong', color: 'error' })
+    submitting.value = false
+    form.priority = '' as ItemPriority
+  }
 }
 </script>
+
+<style scoped>
+.slide-fwd-enter-active,
+.slide-fwd-leave-active,
+.slide-back-enter-active,
+.slide-back-leave-active {
+  transition: all 0.25s ease;
+}
+.slide-fwd-enter-from {
+  transform: translateX(32px);
+  opacity: 0;
+}
+.slide-fwd-leave-to {
+  transform: translateX(-32px);
+  opacity: 0;
+}
+.slide-back-enter-from {
+  transform: translateX(-32px);
+  opacity: 0;
+}
+.slide-back-leave-to {
+  transform: translateX(32px);
+  opacity: 0;
+}
+</style>

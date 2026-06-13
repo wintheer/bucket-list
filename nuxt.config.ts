@@ -27,6 +27,11 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     '@pinia/nuxt',
+    ['@nuxtjs/i18n', {
+      locales: [{ code: 'en', language: 'en-US', files: ['en.json'] }],
+      defaultLocale: 'en',
+      langDir: 'locales',
+    }],
   ],
 
   runtimeConfig: {

@@ -4,7 +4,22 @@
       <UIcon name="i-lucide-arrow-left" class="size-4" /> Back to list
     </NuxtLink>
 
-    <div v-if="!item" class="text-gray-400">Item not found.</div>
+    <!-- Loading skeleton -->
+    <div v-if="!store.loaded && !item" class="space-y-6 animate-pulse">
+      <div class="flex justify-between gap-4">
+        <div class="h-8 bg-gray-100 dark:bg-gray-800 rounded w-2/3" />
+        <div class="h-6 bg-gray-100 dark:bg-gray-800 rounded w-20 shrink-0" />
+      </div>
+      <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-1/3" />
+      <div class="h-24 bg-gray-100 dark:bg-gray-800 rounded-xl" />
+      <div class="space-y-2">
+        <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-full" />
+        <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-5/6" />
+        <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-4/6" />
+      </div>
+    </div>
+
+    <div v-else-if="!item" class="text-gray-400">Item not found.</div>
 
     <template v-else>
       <!-- Header image -->
@@ -14,7 +29,7 @@
 
       <!-- Title + status -->
       <div class="flex items-start justify-between gap-4 mb-2">
-        <h1 class="text-3xl font-bold text-gray-900 leading-tight">{{ item.title }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white leading-tight">{{ item.title }}</h1>
         <UBadge
           :label="STATUS_CONFIG[item.status].label"
           :color="STATUS_CONFIG[item.status].color"
@@ -38,9 +53,9 @@
       </div>
 
       <!-- Why -->
-      <div class="bg-gray-50 rounded-xl p-5 mb-6 border-l-4 border-primary-400">
+      <div class="pl-5 mb-6 border-l-4 border-primary-400">
         <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Why this matters</p>
-        <p class="text-gray-700 italic text-lg leading-relaxed">"{{ item.why }}"</p>
+        <p class="text-gray-600 dark:text-gray-300 italic text-lg leading-relaxed">"{{ item.why }}"</p>
       </div>
 
       <!-- Description -->
@@ -130,7 +145,7 @@
     <UModal v-model:open="confirmDelete">
       <template #content>
         <div class="p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">Delete this item?</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete this item?</h3>
           <p class="text-gray-500 mb-6">This cannot be undone.</p>
           <div class="flex gap-3">
             <UButton color="error" @click="doDelete">Yes, delete</UButton>

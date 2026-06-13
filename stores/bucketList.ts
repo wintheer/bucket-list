@@ -4,9 +4,18 @@ import type { BucketItem, ItemStatus, ItemCategory, LifeArea } from '~/types/buc
 
 export const useBucketListStore = defineStore('bucketList', () => {
   const items = ref<BucketItem[]>([])
+  const loading = ref(false)
+  const loaded = ref(false)
 
   async function load() {
-    items.value = await $fetch<BucketItem[]>('/api/items')
+    if (loading.value) return
+    loading.value = true
+    try {
+      items.value = await $fetch<BucketItem[]>('/api/items')
+      loaded.value = true
+    } finally {
+      loading.value = false
+    }
   }
 
   async function addItem(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<BucketItem> {
@@ -72,6 +81,8 @@ export const useBucketListStore = defineStore('bucketList', () => {
 
   return {
     items,
+    loading,
+    loaded,
     load,
     addItem,
     updateItem,

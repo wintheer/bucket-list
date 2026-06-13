@@ -19,19 +19,19 @@
     <section class="bg-white border-b border-gray-100 py-6 px-6">
       <div class="max-w-5xl mx-auto flex flex-wrap gap-8 justify-center text-center">
         <div>
-          <p class="text-2xl font-bold text-gray-900">{{ store.items.length }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.items.length }}</p>
           <p class="text-xs text-gray-500 mt-0.5">Total goals</p>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-900">{{ store.byStatus['in-progress'].length }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.byStatus['in-progress'].length }}</p>
           <p class="text-xs text-gray-500 mt-0.5">In progress</p>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-900">{{ store.byStatus.done.length }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.byStatus.done.length }}</p>
           <p class="text-xs text-gray-500 mt-0.5">Completed</p>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-900">{{ store.completedThisYear.length }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ store.completedThisYear.length }}</p>
           <p class="text-xs text-gray-500 mt-0.5">Done this year</p>
         </div>
       </div>
@@ -44,7 +44,7 @@
           <UCard class="h-full shadow-sm transition-shadow group-hover:shadow-md">
             <div class="flex flex-col items-center text-center gap-3 py-2">
               <UIcon :name="feature.icon" class="size-8 text-blue-500" />
-              <h3 class="font-semibold text-lg text-gray-900">{{ feature.title }}</h3>
+              <h3 class="font-semibold text-lg text-gray-900 dark:text-white">{{ feature.title }}</h3>
               <p class="text-sm text-gray-500">{{ feature.description }}</p>
             </div>
           </UCard>

@@ -19,7 +19,7 @@
             <p class="text-xs font-semibold uppercase tracking-widest text-green-500 mb-2">
               Goal completed!
             </p>
-            <h2 class="text-2xl font-bold text-gray-900 mb-5 leading-snug">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-5 leading-snug">
               {{ item?.title }}
             </h2>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-4xl mx-auto px-6 py-10">
     <div class="mb-10">
-      <h1 class="text-3xl font-bold text-gray-900">{{ year }} in Review</h1>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ year }} in Review</h1>
       <p class="text-gray-500 mt-1">Your bucket list progress this year.</p>
     </div>
 
@@ -12,7 +12,7 @@
           <div class="flex items-center justify-center gap-1 mb-1">
             <UIcon :name="stat.icon" class="size-4" :class="stat.color" />
           </div>
-          <p class="text-3xl font-bold text-gray-900">{{ stat.value }}</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ stat.label }}</p>
         </div>
       </UCard>
@@ -60,7 +60,7 @@
         >
           <UIcon name="i-lucide-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
           <div class="min-w-0">
-            <p class="font-semibold text-gray-900">{{ item.title }}</p>
+            <p class="font-semibold text-gray-900 dark:text-white">{{ item.title }}</p>
             <p v-if="item.reflection" class="text-sm text-gray-600 mt-1 italic line-clamp-2">"{{ item.reflection }}"</p>
             <p v-else class="text-sm text-gray-400 mt-1">No reflection written yet.</p>
           </div>

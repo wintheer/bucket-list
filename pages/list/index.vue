@@ -2,8 +2,8 @@
   <div class="max-w-6xl mx-auto px-6 py-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">My Bucket List</h1>
-        <p class="text-gray-500 mt-1">{{ store.items.length }} things to do before I die</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Bucket List</h1>
+        <p class="text-gray-500 mt-1">{{ $t('list.subtitle', store.items.length) }}</p>
       </div>
       <div class="flex gap-3">
         <UButton
@@ -18,24 +18,15 @@
       </div>
     </div>
 
-    <!-- Progress bar -->
-    <div v-if="store.items.length > 0" class="mb-8 p-5 rounded-xl bg-gray-50 border border-gray-100">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-medium text-gray-700">
-          {{ store.byStatus.done.length }} of {{ store.items.length }} completed
-        </span>
-        <span class="text-sm font-semibold" :class="progressPercent === 100 ? 'text-green-500' : 'text-gray-400'">
-          {{ progressPercent }}%
-        </span>
-      </div>
-      <div class="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+    <!-- Progress -->
+    <div v-if="store.items.length > 0" class="mb-8">
+      <div class="h-0.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
         <div
-          class="h-full rounded-full transition-all duration-700 ease-out"
-          :class="progressPercent === 100 ? 'bg-green-400' : progressPercent >= 50 ? 'bg-primary-400' : 'bg-primary-300'"
+          class="h-full rounded-full transition-all duration-700 ease-out bg-primary-300/70 dark:bg-primary-600/50"
           :style="{ width: `${progressPercent}%` }"
         />
       </div>
-      <p class="text-xs text-gray-400 mt-2">{{ progressMessage }}</p>
+      <p class="text-xs text-gray-400 italic mt-2">{{ progressMessage }}</p>
     </div>
 
     <!-- Filters -->
@@ -68,8 +59,21 @@
       </div>
     </div>
 
+    <!-- Skeleton loading -->
+    <div v-if="!store.loaded" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div v-for="i in 6" :key="i" class="rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-3 animate-pulse">
+        <div class="flex justify-between gap-3">
+          <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-2/3" />
+          <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded w-16 shrink-0" />
+        </div>
+        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-full" />
+        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-4/5" />
+        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded w-1/3 mt-4" />
+      </div>
+    </div>
+
     <!-- Empty state -->
-    <div v-if="filtered.length === 0" class="text-center py-24 text-gray-400">
+    <div v-else-if="filtered.length === 0" class="text-center py-24 text-gray-400">
       <UIcon name="i-lucide-inbox" class="size-12 mx-auto mb-4" />
       <p class="text-lg font-medium">Nothing here yet</p>
       <p class="text-sm mt-1">Add your first bucket list item or clear the filters.</p>
@@ -89,7 +93,7 @@
             <img :src="item.imageUrl" :alt="item.title" class="w-full h-40 object-cover rounded-t-lg">
           </div>
           <div class="flex items-start justify-between gap-2 mb-2">
-            <h3 class="font-semibold text-gray-900 group-hover:text-primary-600 leading-snug">{{ item.title }}</h3>
+            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 leading-snug">{{ item.title }}</h3>
             <UBadge
               :label="STATUS_CONFIG[item.status].label"
               :color="STATUS_CONFIG[item.status].color"
@@ -119,7 +123,7 @@
       <template #content>
         <div class="p-6" v-if="randomItem">
           <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Today, do this:</p>
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ randomItem.title }}</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ randomItem.title }}</h2>
           <p class="text-gray-500 italic mb-6">"{{ randomItem.why }}"</p>
           <div class="flex gap-3">
             <UButton :to="`/list/${randomItem.id}`" @click="showRandom = false">View item</UButton>
@@ -172,7 +176,7 @@ const progressMessage = computed(() => {
   if (p >= 50) return 'Over halfway! You\'re building real momentum.'
   if (p >= 25) return 'A solid start — keep the energy going.'
   if (p > 0)   return 'Every big life starts with a first step.'
-  return 'The journey of a thousand miles begins with a single item.'
+  return 'The journey of a thousand miles begins with a single step.'
 })
 
 function categoryIcon(cat: ItemCategory) {

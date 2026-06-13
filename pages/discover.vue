@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-6xl mx-auto px-6 py-10">
     <div class="mb-10">
-      <h1 class="text-3xl font-bold text-gray-900">Discover</h1>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Discover</h1>
       <p class="text-gray-500 mt-1">Explore categories and find things that resonate with you.</p>
     </div>
 
@@ -17,7 +17,7 @@
           <div class="flex flex-col items-center text-center py-4 gap-3">
             <UIcon :name="cat.icon" :class="[cat.color, 'size-10']" />
             <div>
-              <p class="font-semibold text-gray-900">{{ cat.label }}</p>
+              <p class="font-semibold text-gray-900 dark:text-white">{{ cat.label }}</p>
               <p class="text-xs text-gray-400 mt-0.5">
                 {{ store.byCategory[cat.value]?.length ?? 0 }} on your list
               </p>
@@ -38,7 +38,7 @@
 
       <div class="flex items-center gap-3 mb-8">
         <UIcon :name="currentCat!.icon" :class="[currentCat!.color, 'size-8']" />
-        <h2 class="text-2xl font-bold text-gray-900">{{ currentCat!.label }}</h2>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ currentCat!.label }}</h2>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
