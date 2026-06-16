@@ -27,3 +27,19 @@ export async function getJournalsCollection() {
   const db = await getDb()
   return db.collection('journals')
 }
+
+export async function getValuesCollection() {
+  return (await getDb()).collection('values')
+}
+
+export async function getWhoAmICollection() {
+  return (await getDb()).collection('whoami')
+}
+
+export async function getLettersCollection() {
+  return (await getDb()).collection('letters')
+}
+
+export async function getMemoriesCollection() {
+  return (await getDb()).collection('memories')
+}

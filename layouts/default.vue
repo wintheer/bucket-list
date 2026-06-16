@@ -9,7 +9,7 @@
           :key="link.to"
           :to="link.to"
           class="nav-link px-3 py-1.5 rounded-md text-sm"
-          :class="{ 'nav-link--active': route.path.startsWith(link.to) && link.to !== '/' }"
+          :class="{ 'nav-link--active': link.to !== '/' && (route.path === link.to || route.path.startsWith(link.to + '/')) }"
         >
           {{ link.label }}
         </NuxtLink>
@@ -42,10 +42,12 @@ function toggleColorMode() {
 }
 
 const navLinks = [
-  { to: '/list',     label: 'My Dreams' },
-  { to: '/journal',  label: 'Journal' },
-  { to: '/discover', label: 'Get Inspired' },
-  { to: '/review',   label: 'Year in Review' },
+  { to: '/list',      label: 'My Dreams' },
+  { to: '/journal',   label: 'Journal' },
+  { to: '/discover',  label: 'Get Inspired' },
+  { to: '/memories',  label: 'Memories' },
+  { to: '/me',        label: 'Me' },
+  { to: '/review',    label: 'Year in Review' },
 ]
 </script>
 

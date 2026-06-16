@@ -76,6 +76,61 @@
         </div>
       </div>
 
+      <!-- Milestones -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Milestones</p>
+          <span v-if="milestones.length" class="text-xs text-gray-400">{{ completedMilestones }}/{{ milestones.length }}</span>
+        </div>
+
+        <!-- Progress bar -->
+        <div v-if="milestones.length" class="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-5">
+          <div
+            class="h-full rounded-full bg-linear-to-r from-sky-300 via-violet-400 to-amber-400 transition-all duration-500"
+            :style="{ width: `${milestonePercent}%` }"
+          />
+        </div>
+
+        <!-- Checklist -->
+        <ul class="space-y-1 mb-3">
+          <li
+            v-for="m in milestones"
+            :key="m.id"
+            class="group flex items-center gap-3 py-1.5 rounded-lg"
+          >
+            <button
+              class="shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-150"
+              :class="m.completed
+                ? 'bg-primary-500 border-primary-500'
+                : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'"
+              @click="toggleMilestone(m.id)"
+            >
+              <UIcon v-if="m.completed" name="i-lucide-check" class="size-3 text-white" />
+            </button>
+            <span
+              class="flex-1 text-sm transition-colors duration-150"
+              :class="m.completed ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-700 dark:text-gray-300'"
+            >{{ m.text }}</span>
+            <button
+              class="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-gray-700 hover:text-red-400 transition-all text-lg leading-none"
+              @click="removeMilestone(m.id)"
+            >×</button>
+          </li>
+        </ul>
+
+        <!-- Add milestone input -->
+        <div class="flex items-center gap-2">
+          <input
+            v-model="newMilestoneText"
+            type="text"
+            placeholder="Add a step..."
+            class="flex-1 text-sm bg-transparent border-b border-dashed border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-600 focus:outline-none py-1 text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-700 transition-colors"
+            @keydown.enter.prevent="addMilestone"
+          />
+          <UButton v-if="newMilestoneText.trim()" size="xs" variant="soft" @click="addMilestone">Add</UButton>
+        </div>
+      </div>
+
       <!-- Journey (progress journal) -->
       <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
@@ -355,6 +410,41 @@ const statusOptions = (Object.keys(STATUS_CONFIG) as ItemStatus[]).map(k => ({
 const catIcon = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.icon ?? 'i-lucide-tag')
 const catLabel = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.label ?? '')
 const catColor = computed(() => CATEGORIES.find(c => c.value === item.value?.category)?.color ?? 'text-gray-500')
+
+// ── Milestones ───────────────────────────────────────────────────────────────
+
+import type { Milestone } from '~/types/bucket'
+
+const newMilestoneText = ref('')
+
+const milestones = computed<Milestone[]>(() => item.value?.milestones ?? [])
+const completedMilestones = computed(() => milestones.value.filter(m => m.completed).length)
+const milestonePercent = computed(() =>
+  milestones.value.length ? Math.round((completedMilestones.value / milestones.value.length) * 100) : 0
+)
+
+async function addMilestone() {
+  const text = newMilestoneText.value.trim()
+  if (!text) return
+  const mid = Date.now().toString(36) + Math.random().toString(36).slice(2)
+  const updated = [...milestones.value, { id: mid, text, completed: false }]
+  newMilestoneText.value = ''
+  await store.updateItem(id, { milestones: updated })
+}
+
+async function toggleMilestone(milestoneId: string) {
+  const updated = milestones.value.map(m =>
+    m.id === milestoneId ? { ...m, completed: !m.completed } : m
+  )
+  await store.updateItem(id, { milestones: updated })
+}
+
+async function removeMilestone(milestoneId: string) {
+  const updated = milestones.value.filter(m => m.id !== milestoneId)
+  await store.updateItem(id, { milestones: updated })
+}
+
+// ── Linked journal entries ───────────────────────────────────────────────────
 
 const linkedJournalEntries = computed(() =>
   journalStore.entries.filter(e => e.linkedGoalIds.includes(id))

@@ -32,6 +32,12 @@ export interface JournalEntry {
   createdAt: string
 }
 
+export interface Milestone {
+  id: string
+  text: string
+  completed: boolean
+}
+
 export interface BucketItem {
   id: string
   title: string
@@ -46,6 +52,7 @@ export interface BucketItem {
   reflection?: string
   notes?: Note[]
   journal?: JournalEntry[]
+  milestones?: Milestone[]
   linkedIds?: string[]
   completedWith?: string
   completedFeeling?: string

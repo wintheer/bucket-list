@@ -77,10 +77,10 @@
         <button
           v-for="cat in CATEGORIES"
           :key="cat.value"
-          class="group text-left"
+          class="group text-left card-hover rounded-2xl"
           @click="activeCategory = cat.value"
         >
-          <UCard class="h-full transition-all hover:shadow-md cursor-pointer">
+          <UCard class="h-full cursor-pointer">
             <div class="flex flex-col items-center text-center py-4 gap-3">
               <UIcon :name="cat.icon" :class="[cat.color, 'size-10']" />
               <div>
@@ -280,5 +280,13 @@ function addPrompt(prompt: string, category?: ItemCategory) {
 .slide-down-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08);
 }
 </style>

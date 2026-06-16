@@ -111,7 +111,7 @@
         class="group block break-inside-avoid mb-5 dream-card"
         :style="{ animationDelay: `${Math.min(i, 9) * 60}ms` }"
       >
-        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden p-6">
+        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden p-6 card-hover">
           <!-- Image -->
           <div v-if="item.imageUrl" class="-mx-6 -mt-6 mb-5">
             <img :src="item.imageUrl" :alt="item.title" class="w-full h-44 object-cover">
@@ -133,6 +133,21 @@
           <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-snug mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">{{ item.title }}</h3>
           <!-- Why — unclamped so cards breathe at different heights -->
           <p v-if="item.why" class="text-sm text-gray-500 dark:text-gray-400 italic leading-relaxed">"{{ item.why }}"</p>
+          <!-- Milestone progress -->
+          <div v-if="item.milestones?.length && item.status !== 'done'" class="mt-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs text-gray-300 dark:text-gray-700">
+                {{ item.milestones.filter(m => m.completed).length }}/{{ item.milestones.length }} steps
+              </span>
+            </div>
+            <div class="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full bg-linear-to-r from-sky-300 via-violet-400 to-amber-400 transition-all duration-500"
+                :style="{ width: `${Math.round((item.milestones.filter(m => m.completed).length / item.milestones.length) * 100)}%` }"
+              />
+            </div>
+          </div>
+
           <!-- Linked journals -->
           <div v-if="dreamJournalMap.get(item.id)" class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800/60">
             <template v-if="dreamJournalMap.get(item.id)!.journals.length">
@@ -333,6 +348,14 @@ function pickRandom() {
 }
 .float-icon {
   animation: floatIcon 4s ease-in-out infinite;
+}
+
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08);
 }
 
 /* Shimmer sweep on progress bar */

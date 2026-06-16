@@ -274,8 +274,14 @@
       <UButton class="mt-6" @click="startNewEntry">Write your first entry</UButton>
     </div>
 
+    <!-- Mood chart -->
+    <div v-if="store.loaded && filteredEntries.filter(e => e.mood).length >= 2" class="mb-10 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 pt-4 pb-3">
+      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Your emotional journey</p>
+      <MoodChart :entries="filteredEntries" />
+    </div>
+
     <!-- Entry list -->
-    <div v-else-if="store.loaded">
+    <div v-if="store.loaded && filteredEntries.length">
       <template v-for="[month, monthEntries] in groupedEntries" :key="month">
         <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4 mt-2">{{ month }}</p>
         <div class="space-y-3 mb-10">
@@ -283,7 +289,7 @@
             v-for="entry in monthEntries"
             v-show="editingId !== entry.id"
             :key="entry.id"
-            class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 border-l-4 transition-all duration-200"
+            class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 border-l-4 transition-all duration-200 card-hover"
             :class="[
               expandedId === entry.id ? 'shadow-md' : '',
             ]"
@@ -716,5 +722,13 @@ function getMoodHexColor(mood?: MoodScore): string {
 .expand-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.07);
 }
 </style>
