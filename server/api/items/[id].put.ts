@@ -1,16 +1,17 @@
 import { getCollection } from '~/server/utils/db'
 
 export default defineEventHandler(async (event) => {
+  const userId = await requireUserId(event)
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
   const now = new Date().toISOString()
 
-  const { id: _ignored, _id: _ignored2, createdAt: _ignored3, ...fields } = body
+  const { id: _ignored, _id: _ignored2, createdAt: _ignored3, userId: _ignored4, ...fields } = body
   const update = { ...fields, updatedAt: now }
 
   const col = await getCollection()
   const result = await col.findOneAndUpdate(
-    { _id: id as any },
+    { _id: id as any, userId },
     { $set: update },
     { returnDocument: 'after' }
   )

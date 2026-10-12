@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     '@pinia/nuxt',
+    'nuxt-auth-utils',
     ['@nuxtjs/i18n', {
       locales: [{ code: 'en', language: 'en-US', files: ['en.json'] }],
       defaultLocale: 'en',
@@ -36,6 +37,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     mongodbUri: '',
+    signupSecret: '',
   },
 
   typescript: {

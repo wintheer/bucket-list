@@ -28,14 +28,14 @@ export const useMemoriesStore = defineStore('memories', () => {
     return new Map([...map.entries()].sort((a, b) => b[0] - a[0]))
   })
 
-  async function addMemory(data: Omit<Memory, 'id' | 'createdAt' | 'updatedAt'>) {
+  async function addMemory(data: Omit<Memory, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) {
     const m = await $fetch<Memory>('/api/memories', { method: 'POST', body: data })
     memories.value.unshift(m)
     memories.value.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return m
   }
 
-  async function updateMemory(id: string, data: Partial<Omit<Memory, 'id' | 'createdAt'>>) {
+  async function updateMemory(id: string, data: Partial<Omit<Memory, 'id' | 'userId' | 'createdAt'>>) {
     const updated = await $fetch<Memory>(`/api/memories/${id}`, { method: 'PUT', body: data })
     const idx = memories.value.findIndex(m => m.id === id)
     if (idx !== -1) memories.value[idx] = updated

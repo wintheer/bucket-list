@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav class="bg-gray-900 text-white px-6 py-3 flex items-center gap-6 sticky top-0 z-50">
+    <nav v-if="!isAuthPage" class="bg-gray-900 text-white px-6 py-3 flex items-center gap-6 sticky top-0 z-50">
       <NuxtLink to="/" class="font-bold text-lg tracking-tight shrink-0">bucket list</NuxtLink>
 
       <div class="flex items-center gap-1 mx-auto">
@@ -24,6 +24,16 @@
           <UIcon :name="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" class="size-4" />
         </button>
         <UButton size="sm" icon="i-lucide-plus" to="/add">Add a dream</UButton>
+        <div v-if="user" class="flex items-center gap-2 pl-2 ml-1 border-l border-white/10">
+          <span class="text-sm text-white/70 max-w-40 truncate">{{ user.name || user.email }}</span>
+          <button
+            class="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            title="Log out"
+            @click="logout"
+          >
+            <UIcon name="i-lucide-log-out" class="size-4" />
+          </button>
+        </div>
       </div>
     </nav>
 
@@ -32,13 +42,22 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const colorMode = useColorMode()
+const { user, clear } = useUserSession()
+
+const isAuthPage = computed(() => route.path === '/login')
 
 function toggleColorMode() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
+
+async function logout() {
+  await clear()
+  await reloadNuxtApp({ path: '/login' })
 }
 
 const navLinks = [
@@ -46,6 +65,7 @@ const navLinks = [
   { to: '/journal',   label: 'Journal' },
   { to: '/discover',  label: 'Get Inspired' },
   { to: '/memories',  label: 'Memories' },
+  { to: '/world',     label: 'World' },
   { to: '/me',        label: 'Me' },
   { to: '/review',    label: 'Year in Review' },
 ]

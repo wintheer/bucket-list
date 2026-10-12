@@ -1,3 +1,7 @@
 {
-  "svg.preview.background": "transparent"
+  "svg.preview.background": "transparent",
+  "i18n-ally.localesPaths": [
+    "i18n",
+    "i18n/locales"
+  ]
 }

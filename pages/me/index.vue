@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-2xl mx-auto px-6 py-10">
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Me</h1>
-    <p class="text-gray-500 dark:text-gray-400 mb-8">Your values, your story, your letters.</p>
+    <p class="text-gray-500 dark:text-gray-400 mb-8">Your values, your story, your letters, your exercises.</p>
 
     <!-- Tabs -->
     <div class="flex gap-0 border-b border-gray-100 dark:border-gray-800 mb-10">
@@ -26,9 +26,15 @@
     <template v-else>
       <!-- ── VALUES ─────────────────────────────────────────────────── -->
       <div v-if="activeTab === 'values'">
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
           What matters most to you? Articulating your values helps you understand which dreams and experiences truly align with who you are.
         </p>
+        <NuxtLink
+          to="/me/values-wizard"
+          class="text-sm text-primary-600 dark:text-primary-400 hover:underline mb-6 inline-flex items-center gap-1"
+        >
+          <UIcon name="i-lucide-compass" class="size-3.5" /> Explore with a guided exercise
+        </NuxtLink>
 
         <!-- Add form -->
         <div class="mb-8 p-5 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
@@ -60,6 +66,7 @@
               />
             </div>
             <UButton :disabled="!newValue.name.trim()" size="sm" @click="addValue">Add value</UButton>
+            <p v-if="duplicateValueWarning" class="text-xs text-amber-500">You already have that value saved.</p>
           </div>
         </div>
 
@@ -128,6 +135,54 @@
             >
               <p class="text-xs text-gray-400 mb-1">{{ formatDate(v.createdAt) }}</p>
               <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap line-clamp-4">{{ v.text }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EXERCISES ───────────────────────────────────────────────── -->
+      <div v-if="activeTab === 'exercises'">
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          Well-established exercises from positive psychology and coaching. Come back to them whenever you like.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-3 mb-10">
+          <NuxtLink
+            v-for="ex in exerciseCards"
+            :key="ex.to"
+            :to="ex.to"
+            class="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary-200 dark:hover:border-primary-800 transition-colors"
+          >
+            <UIcon :name="ex.icon" class="size-5 text-primary-500 mb-3" />
+            <p class="font-semibold text-gray-900 dark:text-white">{{ ex.title }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ ex.description }}</p>
+            <p v-if="ex.status" class="text-xs text-gray-400 mt-3">{{ ex.status }}</p>
+          </NuxtLink>
+        </div>
+
+        <!-- Past visions -->
+        <div v-if="exercises.visions.length">
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Your visions</p>
+          <div class="space-y-3">
+            <div
+              v-for="v in exercises.visions"
+              :key="v.id"
+              class="group rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 cursor-pointer"
+              @click="expandedVisionId = expandedVisionId === v.id ? null : v.id"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-xs text-gray-400">
+                  Written {{ formatDate(v.createdAt) }} · looking ahead to {{ new Date(v.createdAt).getFullYear() + v.horizonYears }}
+                </p>
+                <button
+                  class="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-gray-700 hover:text-red-400 transition-all text-lg leading-none"
+                  @click.stop="exercises.deleteVision(v.id)"
+                >×</button>
+              </div>
+              <p
+                class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
+                :class="expandedVisionId !== v.id ? 'line-clamp-3' : ''"
+              >{{ v.text }}</p>
             </div>
           </div>
         </div>
@@ -236,15 +291,18 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useMeStore } from '~/stores/me'
+import { useExercisesStore } from '~/stores/exercises'
 import { VALUE_COLORS, valueHex } from '~/types/me'
 
 const store = useMeStore()
-onMounted(() => store.load())
+const exercises = useExercisesStore()
+onMounted(() => Promise.all([store.load(), exercises.load()]))
 
 const tabs = [
   { value: 'values', label: 'Values' },
   { value: 'whoami', label: 'Who Am I' },
   { value: 'letters', label: 'Letters' },
+  { value: 'exercises', label: 'Exercises' },
 ] as const
 
 type Tab = typeof tabs[number]['value']
@@ -254,9 +312,18 @@ const activeTab = ref<Tab>('values')
 
 const newValue = ref({ name: '', description: '', color: 'violet' })
 
+const duplicateValueWarning = ref(false)
+
 async function addValue() {
-  if (!newValue.value.name.trim()) return
-  await store.addValue({ name: newValue.value.name.trim(), description: newValue.value.description.trim() || undefined, color: newValue.value.color })
+  const name = newValue.value.name.trim()
+  if (!name) return
+  const isDuplicate = store.values.some(v => v.name.trim().toLowerCase() === name.toLowerCase())
+  if (isDuplicate) {
+    duplicateValueWarning.value = true
+    setTimeout(() => { duplicateValueWarning.value = false }, 2500)
+    return
+  }
+  await store.addValue({ name, description: newValue.value.description.trim() || undefined, color: newValue.value.color })
   newValue.value = { name: '', description: '', color: 'violet' }
 }
 
@@ -271,6 +338,41 @@ async function saveWhoAmI() {
   if (!whoAmIText.value.trim() || whoAmIText.value === store.currentStatement) return
   await store.saveWhoAmI(whoAmIText.value.trim())
 }
+
+// ── Exercises ────────────────────────────────────────────────────────────────
+
+const expandedVisionId = ref<string | null>(null)
+
+const exerciseCards = computed(() => [
+  {
+    to: '/me/wheel-of-life',
+    icon: 'i-lucide-chart-pie',
+    title: 'Wheel of Life',
+    description: 'Rate how satisfied you are in each area of life and see where to focus.',
+    status: exercises.latestWheel ? `Last check-in ${formatDate(exercises.latestWheel.createdAt)}` : '',
+  },
+  {
+    to: '/me/best-possible-self',
+    icon: 'i-lucide-telescope',
+    title: 'Best Possible Self',
+    description: 'Write about your future when everything has gone well, then turn it into dreams.',
+    status: exercises.visions.length ? `${exercises.visions.length} ${exercises.visions.length === 1 ? 'vision' : 'visions'} written` : '',
+  },
+  {
+    to: '/gratitude',
+    icon: 'i-lucide-sun',
+    title: 'Three Good Things',
+    description: 'Each evening, note three things that went well and why.',
+    status: exercises.gratitudeStreak ? `${exercises.gratitudeStreak} day streak` : '',
+  },
+  {
+    to: '/me/values-wizard',
+    icon: 'i-lucide-compass',
+    title: 'Values explorer',
+    description: 'Browse value words by life area and narrow down what matters most.',
+    status: store.values.length ? `${store.values.length} values saved` : '',
+  },
+])
 
 // ── Letters ───────────────────────────────────────────────────────────────────
 

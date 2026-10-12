@@ -1,6 +1,7 @@
 import { getCollection } from '~/server/utils/db'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  await requireUserSession(event)
   const col = await getCollection()
   const docs = await col
     .find({ isPrivate: { $ne: true } }, { projection: { title: 1, category: 1 } })

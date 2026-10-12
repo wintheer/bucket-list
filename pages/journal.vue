@@ -14,6 +14,23 @@
       </UButton>
     </div>
 
+    <!-- Three good things prompt -->
+    <NuxtLink
+      v-if="exercises.loaded"
+      to="/gratitude"
+      class="flex items-center gap-3 mb-6 px-4 py-3 rounded-xl border transition-colors"
+      :class="exercises.todaysGratitude
+        ? 'border-gray-100 dark:border-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+        : 'border-amber-100 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20 text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/40'"
+    >
+      <UIcon :name="exercises.todaysGratitude ? 'i-lucide-check' : 'i-lucide-sun'" class="size-4 shrink-0" :class="exercises.todaysGratitude ? 'text-green-500' : 'text-amber-500'" />
+      <span class="flex-1 text-sm">
+        {{ exercises.todaysGratitude ? 'Three good things written today' : 'What were three good things about today?' }}
+      </span>
+      <span v-if="exercises.gratitudeStreak > 1" class="text-xs text-gray-400">{{ exercises.gratitudeStreak }} day streak</span>
+      <UIcon name="i-lucide-chevron-right" class="size-4 text-gray-300 dark:text-gray-600" />
+    </NuxtLink>
+
     <!-- Journal tabs -->
     <div class="flex items-center gap-0 mb-6 border-b border-gray-100 dark:border-gray-800 overflow-x-auto">
       <!-- All -->
@@ -186,6 +203,19 @@
               />
             </div>
           </Transition>
+
+          <div>
+            <button
+              class="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              @click="showFeelingsWheel = !showFeelingsWheel"
+            >
+              <UIcon name="i-lucide-circle-dot" class="size-3.5" />
+              {{ showFeelingsWheel ? 'Hide feelings wheel' : 'Find the right word with the feelings wheel' }}
+            </button>
+            <Transition name="fade-down">
+              <FeelingsWheel v-if="showFeelingsWheel" v-model="form.moodWords" class="mt-3" />
+            </Transition>
+          </div>
 
           <!-- Title + body -->
           <input
@@ -373,6 +403,7 @@
 import { ref, reactive, computed, nextTick, onMounted } from 'vue'
 import { useJournalStore } from '~/stores/journal'
 import { useBucketListStore } from '~/stores/bucketList'
+import { useExercisesStore } from '~/stores/exercises'
 import { MOOD_CONFIG, JOURNAL_COLORS } from '~/types/journal'
 import type { MoodScore, PersonalEntry } from '~/types/journal'
 import type { BucketItem, ItemCategory } from '~/types/bucket'
@@ -380,18 +411,21 @@ import { CATEGORIES } from '~/types/bucket'
 
 const store = useJournalStore()
 const bucketStore = useBucketListStore()
+const exercises = useExercisesStore()
 const textareaRef = ref<HTMLTextAreaElement>()
 
 function autoResize() {
   const el = textareaRef.value
   if (!el) return
+  const scrollY = window.scrollY
   el.style.height = 'auto'
   el.style.height = el.scrollHeight + 'px'
+  window.scrollTo({ top: scrollY, behavior: 'instant' })
 }
 const newJournalInputRef = ref<HTMLInputElement>()
 
 onMounted(async () => {
-  await Promise.all([store.load(), store.loadJournals(), bucketStore.load()])
+  await Promise.all([store.load(), store.loadJournals(), bucketStore.load(), exercises.load()])
 })
 
 const MOOD_SCORES: MoodScore[] = [1, 2, 3, 4, 5]
@@ -602,6 +636,7 @@ function selectMood(score: MoodScore) {
 }
 
 const customWordInput = ref('')
+const showFeelingsWheel = ref(false)
 
 const customWords = computed(() =>
   form.moodWords.filter(w => !currentMoodWords.value.includes(w))

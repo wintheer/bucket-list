@@ -40,6 +40,7 @@ export interface Milestone {
 
 export interface BucketItem {
   id: string
+  userId: string
   title: string
   description: string
   why: string

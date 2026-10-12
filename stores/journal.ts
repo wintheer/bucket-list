@@ -19,13 +19,13 @@ export const useJournalStore = defineStore('journal', () => {
     }
   }
 
-  async function addEntry(data: Omit<PersonalEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<PersonalEntry> {
+  async function addEntry(data: Omit<PersonalEntry, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<PersonalEntry> {
     const entry = await $fetch<PersonalEntry>('/api/journal', { method: 'POST', body: data })
     entries.value.unshift(entry)
     return entry
   }
 
-  async function updateEntry(id: string, data: Partial<Omit<PersonalEntry, 'id' | 'createdAt'>>) {
+  async function updateEntry(id: string, data: Partial<Omit<PersonalEntry, 'id' | 'userId' | 'createdAt'>>) {
     const updated = await $fetch<PersonalEntry>(`/api/journal/${id}`, { method: 'PUT', body: data })
     const idx = entries.value.findIndex(e => e.id === id)
     if (idx !== -1) entries.value[idx] = updated

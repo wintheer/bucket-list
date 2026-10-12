@@ -2,6 +2,7 @@ export type MoodScore = 1 | 2 | 3 | 4 | 5
 
 export interface Journal {
   id: string
+  userId: string
   name: string
   color: string
   createdAt: string
@@ -9,6 +10,7 @@ export interface Journal {
 
 export interface PersonalEntry {
   id: string
+  userId: string
   journalId?: string
   title?: string
   text: string

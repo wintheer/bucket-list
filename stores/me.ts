@@ -35,7 +35,7 @@ export const useMeStore = defineStore('me', () => {
   })
 
   // Values
-  async function addValue(data: Omit<PersonalValue, 'id' | 'createdAt'>) {
+  async function addValue(data: Omit<PersonalValue, 'id' | 'userId' | 'createdAt'>) {
     const v = await $fetch<PersonalValue>('/api/values', { method: 'POST', body: data })
     values.value.push(v)
     return v
@@ -54,7 +54,7 @@ export const useMeStore = defineStore('me', () => {
   }
 
   // Letters
-  async function addLetter(data: Omit<Letter, 'id' | 'createdAt'>) {
+  async function addLetter(data: Omit<Letter, 'id' | 'userId' | 'createdAt'>) {
     const l = await $fetch<Letter>('/api/letters', { method: 'POST', body: data })
     letters.value.unshift(l)
     return l

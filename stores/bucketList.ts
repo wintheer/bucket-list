@@ -18,13 +18,13 @@ export const useBucketListStore = defineStore('bucketList', () => {
     }
   }
 
-  async function addItem(data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<BucketItem> {
+  async function addItem(data: Omit<BucketItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<BucketItem> {
     const item = await $fetch<BucketItem>('/api/items', { method: 'POST', body: data })
     items.value.unshift(item)
     return item
   }
 
-  async function updateItem(id: string, data: Partial<Omit<BucketItem, 'id' | 'createdAt'>>) {
+  async function updateItem(id: string, data: Partial<Omit<BucketItem, 'id' | 'userId' | 'createdAt'>>) {
     const updated = await $fetch<BucketItem>(`/api/items/${id}`, { method: 'PUT', body: data })
     const idx = items.value.findIndex(i => i.id === id)
     if (idx !== -1) items.value[idx] = updated

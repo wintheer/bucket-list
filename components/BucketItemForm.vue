@@ -81,7 +81,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Omit<BucketItem, 'id' | 'createdAt' | 'updatedAt'>]
+  submit: [data: Omit<BucketItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>]
   cancel: []
 }>()
 

@@ -56,7 +56,15 @@
               @keydown.enter.prevent="addFeeling"
               @keydown.188.prevent="addFeeling"
             />
+            <button
+              class="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ml-1"
+              @click="showFeelingsWheel = !showFeelingsWheel"
+            >
+              <UIcon name="i-lucide-circle-dot" class="size-3.5" />
+              {{ showFeelingsWheel ? 'Hide wheel' : 'Feelings wheel' }}
+            </button>
           </div>
+          <FeelingsWheel v-if="showFeelingsWheel" v-model="form.feelings" class="mt-3" />
         </div>
 
         <div class="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
@@ -127,6 +135,7 @@ const composing = ref(false)
 const editingId = ref<string | null>(null)
 const saving = ref(false)
 const feelingInput = ref('')
+const showFeelingsWheel = ref(false)
 
 const form = reactive({
   title: '',
